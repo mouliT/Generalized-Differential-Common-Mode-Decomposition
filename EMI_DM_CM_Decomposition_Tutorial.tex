@@ -386,12 +386,280 @@ MCPM                & Multichip power module                          & --- \\
 \end{center}
 
 % ============================================================
-% SECTIONS 1–5 — TO BE WRITTEN ONE AT A TIME
+\section{Defining CM and DM: From Words to Mathematics}
 % ============================================================
 
-% \section{Defining CM and DM: From Words to Mathematics}
-% TODO: §1 — Fig. 1 circuit walk, CM/DM definitions Eqs.(1)-(4),
-%            transformation matrices Eqs.(5)-(8), 2-line example
+In Section~0 we described DM and CM in plain language.  Now we turn
+those descriptions into precise mathematics — definitions that can be
+applied to any number of lines and packaged into a matrix
+transformation that the rest of the paper uses as its engine.
+
+% ------------------------------------------------------------
+\subsection{The General \texorpdfstring{$N$}{N}-Line System}
+% ------------------------------------------------------------
+
+\figentry{fig:P1Fig1}{GDCMDMCEAP_Fig1_page01}
+{General $N$-line model used to define CM and DM quantities.
+ Each line carries current $i_n$ through a series $R$--$L$ impedance.
+ Shunt capacitors connect each line to ground: $C$ for lines 1 through
+ $N-1$, and $kC$ for line $N$ (the asymmetric line).
+ The floating reference $P$ is distinct from ground;
+ $v_{nP}$ is the voltage from line $n$ to $P$,
+ and $v_{Pg}$ is the voltage from $P$ to ground.}{0.72}
+
+\figref{fig:P1Fig1} is the general model the paper uses throughout.
+Walk through it from left to right:
+
+\begin{circuitbox}[Circuit Walk — Fig.~1]
+\begin{itemize}
+    \item \textbf{$N$ parallel lines:} Each horizontal wire is one
+          ``line'' — it could be a phase conductor, a terminal of a
+          transistor chip, or a filter inductor branch.  Line $n$
+          carries current $i_n$ from left to right ($i_n'$ exits on
+          the far right after passing through the series $R$--$L$).
+
+    \item \textbf{Series $R$--$L$ impedance:} Each line has a
+          resistance $R$ and inductance $L$ in series.  This models
+          cable resistance, bond-wire inductance, or busbar
+          impedance — whatever is in series with that conductor.
+
+    \item \textbf{Shunt capacitors to ground:} On the right end,
+          each line has a capacitor to ground.  Lines 1 through $N-1$
+          each have capacitance $C$.  Line $N$ has capacitance $kC$,
+          where $k \neq 1$ makes this line asymmetric with respect to
+          the others.  In the MCPM application ($k < 1$), this is the
+          source terminal whose capacitance to the baseplate is smaller
+          than the rest.
+
+    \item \textbf{Floating reference $P$:} On the left, a point $P$
+          is defined with voltages $v_{nP}$ measured from each line $n$
+          to $P$.  Crucially, $P$ is \emph{not} ground — it floats.
+          Its voltage with respect to ground is $v_{Pg}$.
+\end{itemize}
+\end{circuitbox}
+
+% ------------------------------------------------------------
+\subsection{Why a Floating Reference Instead of Ground?}
+% ------------------------------------------------------------
+
+In classical two-wire analysis, voltages are measured to ground and
+DM is simply half the line-to-line voltage.  The paper adopts a more
+general approach: voltages are measured to an \emph{arbitrary
+floating reference} $P$.  This may seem like unnecessary abstraction,
+but it has a powerful consequence that becomes clear in the
+decomposition:
+
+\begin{physbox}[The Key Result of Using a Floating Reference]
+After decomposition, the ground voltage $v_{Pg}$ appears
+\textbf{only} in the CM equation — it vanishes from every DM
+equation.  This means the DM quantities are completely
+\emph{independent of ground}.  Only the CM equation ``sees'' the
+ground connection.
+
+Practically, $P$ can be chosen to be any convenient internal circuit
+node (such as the phase terminal~$A$ of the half-bridge in \S4).
+That choice eliminates $v_{Pg}$ from the CM equation entirely,
+simplifying the resulting equivalent circuit.
+\end{physbox}
+
+% ------------------------------------------------------------
+\subsection{CM Current and Voltage: The Definitions}
+% ------------------------------------------------------------
+
+For the $N$-line system of \figref{fig:P1Fig1}, the CM quantities are:
+
+\begin{eqnbox}[CM Definitions — Equations (1) and (2)]
+\begin{align}
+    \icm  &\triangleq \sum_{n=1}^{N} i_n
+           \label{eq:icm} \\[4pt]
+    \vcm  &\triangleq \frac{1}{N} \sum_{n=1}^{N} v_{nP}
+           \label{eq:vcm}
+\end{align}
+\textbf{CM current} is the sum of all line currents.
+\textbf{CM voltage} is the average of all line-to-$P$ voltages.
+\end{eqnbox}
+
+These match the intuition from \S0: CM current is what you measure
+with a clamp around all wires together, and CM voltage is the
+``average'' floating potential of all lines relative to the chosen
+reference.
+
+\begin{warningbox}[CM Current Is Signed]
+In a perfectly balanced system all line currents sum to zero:
+$\icm = 0$.  Any non-zero $\icm$ is entirely due to currents that
+have ``escaped'' through the shunt capacitors to ground — exactly
+the conducted EMI we are trying to model.
+\end{warningbox}
+
+% ------------------------------------------------------------
+\subsection{DM Current and Voltage: The Definitions}
+% ------------------------------------------------------------
+
+The paper defines DM quantities for every \emph{adjacent pair} of
+lines.  For lines $m$ and $n$:
+
+\begin{eqnbox}[DM Definitions — Equations (3) and (4)]
+\begin{align}
+    i_{mn} &\triangleq \frac{1}{\Ni}(i_m - i_n)
+            \label{eq:idm} \\[4pt]
+    v_{mn} &\triangleq v_{mP} - v_{nP}
+            \label{eq:vdm}
+\end{align}
+where $\Ni$ is a normalisation factor.
+\end{eqnbox}
+
+For $N$ lines there are $N-1$ adjacent DM pairs
+(1--2, 2--3, \ldots, $(N-1)$--$N$) plus 1 CM quantity, giving $N$
+quantities total — the same count as the original $N$ line currents.
+The set is therefore a complete, invertible re-description of the
+original variables.
+
+\textbf{The normalisation factor $\Ni$:}
+The paper uses $\Ni = 2$.  This specific choice ensures that for
+\emph{symmetric} lines the DM impedances in the decomposed circuit
+equal the \emph{series combination} of the two per-line impedances
+seen by that DM current loop — a physically intuitive result
+(two resistors $R$ in series give $2R$, which equals $R' = \Ni R$
+with $\Ni = 2$).  An alternative $\Ni = \sqrt{N}$ would give
+$|\mathbf{T}_N^i| = 1$ (unit determinant) but produces less
+intuitive element values.
+
+% ------------------------------------------------------------
+\subsection{Packing the Definitions into Transformation Matrices}
+% ------------------------------------------------------------
+
+The $N$ definitions above — $(N-1)$ DM pairs plus 1 CM — can be
+written as a single matrix equation.  Collect the original line
+currents into a column vector $\ivec = [i_1,\, i_2,\, \ldots,\, i_N]^T$
+and the decomposed quantities into
+$\iDCM = [i_{12},\, i_{23},\, \ldots,\, i_{(N-1)N},\, \icm]^T$.
+Then:
+
+\begin{eqnbox}[Transformation Equations — Equations (5) and (6)]
+\begin{align}
+    \iDCM &= \TiN\, \ivec  \label{eq:Ti} \\[4pt]
+    \vDCM &= \TvN\, \vvec  \label{eq:Tv}
+\end{align}
+\end{eqnbox}
+
+Writing out the matrices in full (Equations (7) and (8) in the paper):
+
+\begin{equation}
+\label{eq:TiN}
+\TiN =
+\begin{bmatrix}
+\frac{1}{\Ni} & -\frac{1}{\Ni} & 0 & \cdots & 0 & 0 \\
+0 & \frac{1}{\Ni} & -\frac{1}{\Ni} & \cdots & 0 & 0 \\
+\vdots & & \ddots & \ddots & & \vdots \\
+0 & 0 & \cdots & 0 & \frac{1}{\Ni} & -\frac{1}{\Ni} \\
+1 & 1 & \cdots & 1 & 1 & 1
+\end{bmatrix}
+\end{equation}
+
+\begin{equation}
+\label{eq:TvN}
+\TvN =
+\begin{bmatrix}
+1 & -1 & 0 & \cdots & 0 & 0 \\
+0 & 1 & -1 & \cdots & 0 & 0 \\
+\vdots & & \ddots & \ddots & & \vdots \\
+0 & 0 & \cdots & 0 & 1 & -1 \\
+\frac{1}{N} & \frac{1}{N} & \cdots & \frac{1}{N} & \frac{1}{N} & \frac{1}{N}
+\end{bmatrix}
+\end{equation}
+
+\begin{physbox}[Reading the Matrix Structure]
+\begin{itemize}
+    \item \textbf{Rows 1 to $N-1$:} Each row picks out one DM pair.
+          Row $k$ subtracts line $k+1$ from line $k$ (scaled by
+          $1/\Ni$ for currents, unscaled for voltages).
+
+    \item \textbf{Last row:} Computes the CM quantity — sum of all
+          currents for $\TiN$, average of all voltages (weight $1/N$)
+          for $\TvN$.
+
+    \item \textbf{Invertibility:} Both matrices are square and
+          invertible, so the original line variables can always be
+          recovered from the decomposed set.
+\end{itemize}
+\end{physbox}
+
+% ------------------------------------------------------------
+\subsection{Worked Example: \texorpdfstring{$N = 2$}{N = 2} Lines}
+% ------------------------------------------------------------
+
+With $N = 2$ and $\Ni = 2$ the matrices reduce to $2 \times 2$:
+
+\[
+\mathbf{T}^{i}_{2} =
+\begin{bmatrix} \tfrac{1}{2} & -\tfrac{1}{2} \\ 1 & 1 \end{bmatrix},
+\qquad
+\mathbf{T}^{v}_{2} =
+\begin{bmatrix} 1 & -1 \\ \tfrac{1}{2} & \tfrac{1}{2} \end{bmatrix}.
+\]
+
+Applying the current transform:
+\[
+\iDCM = \mathbf{T}^{i}_{2}
+\begin{bmatrix} i_1 \\ i_2 \end{bmatrix}
+=
+\begin{bmatrix} \tfrac{i_1 - i_2}{2} \\ i_1 + i_2 \end{bmatrix}
+=
+\begin{bmatrix} i_{12} \\ \icm \end{bmatrix}.
+\]
+
+This is exactly the intuitive result: the DM current is half the
+difference of the two line currents, and the CM current is their sum.
+
+\begin{eqnbox}[Inverse Transform — Recovering Line Currents]
+Inverting gives the original line currents as a mix of DM and CM:
+\begin{align}
+    i_1 &= \icm + i_{12}
+           \quad\text{(CM plus DM)} \\
+    i_2 &= \icm - i_{12}
+           \quad\text{(CM minus DM)}
+\end{align}
+Every line current is the superposition of a CM component
+(identical on both lines) and a DM component (equal and opposite).
+In a purely power-carrying circuit with no EMI leakage,
+$\icm = 0$ and $i_1 = -i_2 = i_{12}$.
+\end{eqnbox}
+
+Applying the voltage transform:
+\[
+\vDCM = \mathbf{T}^{v}_{2}
+\begin{bmatrix} v_{1P} \\ v_{2P} \end{bmatrix}
+=
+\begin{bmatrix} v_{1P} - v_{2P} \\ \tfrac{v_{1P} + v_{2P}}{2} \end{bmatrix}
+=
+\begin{bmatrix} v_{12} \\ \vcm \end{bmatrix}.
+\]
+
+The DM voltage $v_{12}$ is the line-to-line voltage (independent of
+where $P$ is), and the CM voltage $\vcm$ is the average of the two
+line-to-$P$ voltages (shifts with the choice of $P$, but always
+appears paired with $v_{Pg}$ in the CM equation so the
+ground-referenced quantity is always well-defined).
+
+\begin{statebox}[Summary of \S1]
+\begin{itemize}
+    \item \textbf{CM:} sum of line currents; average of line-to-$P$
+          voltages. Appears in conducted EMI. Connects to ground
+          through $v_{Pg}$.
+    \item \textbf{DM ($N-1$ pairs):} scaled difference of adjacent
+          line currents; line-to-line voltage differences.
+          Independent of ground.
+    \item \textbf{Transformation matrices $\TiN$, $\TvN$:}
+          $N \times N$, invertible, pack all CM/DM definitions into
+          two matrix equations.
+    \item \textbf{Normalisation $\Ni = 2$:} gives DM circuit elements
+          equal to series combinations of their per-line counterparts.
+\end{itemize}
+\end{statebox}
+
+% ============================================================
+% SECTIONS 2–5 — TO BE WRITTEN ONE AT A TIME
+% ============================================================
 
 % \section{How Asymmetry Couples the Two Modes}
 % TODO: §2 — N-line MM equations (Eq. 9), applying transform (Eq. 10),
