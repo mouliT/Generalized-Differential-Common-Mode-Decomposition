@@ -514,15 +514,52 @@ quantities total — the same count as the original $N$ line currents.
 The set is therefore a complete, invertible re-description of the
 original variables.
 
-\textbf{The normalisation factor $\Ni$:}
-The paper uses $\Ni = 2$.  This specific choice ensures that for
-\emph{symmetric} lines the DM impedances in the decomposed circuit
-equal the \emph{series combination} of the two per-line impedances
-seen by that DM current loop — a physically intuitive result
-(two resistors $R$ in series give $2R$, which equals $R' = \Ni R$
-with $\Ni = 2$).  An alternative $\Ni = \sqrt{N}$ would give
-$|\mathbf{T}_N^i| = 1$ (unit determinant) but produces less
-intuitive element values.
+\textbf{Why does $\Ni$ exist, and why is it 2?}
+
+The normalisation factor $\Ni$ is a free parameter — you could set it
+to 1, to $\sqrt{N}$, or to any non-zero value and the mathematics
+would remain valid.  The question is: which choice produces the most
+\emph{physically readable} decomposed circuit?
+
+Consider two symmetric lines, each with resistance $R$, carrying
+a pure DM current of 3\,A (3\,A out on line~1, 3\,A back on line~2).
+Trace the DM current path: it travels through $R$ on line~1, then
+back through $R$ on line~2.  The total loop resistance is $2R$.
+You would draw this DM loop as a single resistor of value $2R$.
+
+Now compute $i_{12}$ with each candidate $\Ni$:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{cccc}
+\toprule
+$\Ni$ & $i_{12} = \frac{i_1 - i_2}{\Ni}$ & DM element & Physical match? \\
+\midrule
+$1$      & $\frac{3-(-3)}{1} = 6\,\text{A}$  & $1\cdot R = R$       & $6\,\text{A}$ through $R$? No — actual wire carries 3\,A \\
+$2$      & $\frac{3-(-3)}{2} = 3\,\text{A}$  & $2\cdot R = 2R$      & $3\,\text{A}$ through $2R$ = series loop \checkmark \\
+$\sqrt{2}$ & $\frac{6}{\sqrt{2}} \approx 4.2\,\text{A}$ & $\sqrt{2}R$ & $4.2\,\text{A}$ through $\sqrt{2}R$? No clear meaning \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{physbox}[Why $\Ni = 2$ is the right choice]
+With $\Ni = 2$ the DM current $i_{12} = (i_1 - i_2)/2$ equals the
+actual physical current flowing in each wire during pure DM
+($i_{12} = 3\,\text{A}$ = the actual 3\,A in line~1).  As a result,
+the DM impedance that appears in the decomposed equations is exactly
+the \emph{series combination} of the two per-line impedances — the
+same value you would assign if you physically drew the DM current
+loop and added up the resistances it passes through.
+
+With $\Ni = 1$ the ``DM current'' is 6\,A but each wire only carries
+3\,A — the number has no direct physical counterpart.
+With $\Ni = \sqrt{2}$ the DM impedance $\sqrt{2}\,R$ has no simple
+circuit interpretation at all.
+
+Only $\Ni = 2$ keeps the DM current equal to the per-wire current
+\emph{and} the DM impedance equal to the familiar series combination.
+This is the sole reason for the choice.
+\end{physbox}
 
 % ------------------------------------------------------------
 \subsection{Packing the Definitions into Transformation Matrices}
