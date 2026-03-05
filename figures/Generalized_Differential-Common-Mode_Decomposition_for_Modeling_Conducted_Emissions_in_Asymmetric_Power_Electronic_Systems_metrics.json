@@ -1,0 +1,146 @@
+{
+  "pdf": "Generalized_Differential-Common-Mode_Decomposition_for_Modeling_Conducted_Emissions_in_Asymmetric_Power_Electronic_Systems.pdf",
+  "standard": {
+    "min_aspect_ratio": 0.3,
+    "max_aspect_ratio": 4.0,
+    "min_fill_ratio": 0.05,
+    "max_fill_ratio": 0.95,
+    "min_edge_sharpness": 50.0,
+    "max_white_border_fraction": 0.3,
+    "max_text_contamination": 0.8,
+    "min_pixel_intensity_std": 10.0,
+    "min_confidence_score": 0.65,
+    "marginal_confidence_score": 0.35
+  },
+  "summary": {
+    "total": 7,
+    "good": 7,
+    "marginal": 0,
+    "reject": 0,
+    "mean_confidence": 0.7929,
+    "min_confidence": 0.65
+  },
+  "figures": [
+    {
+      "path": "C:\\Users\\tmouli\\Documents\\AI_trainig_data\\Vignesh\\ECCE_2026\\figures\\GDCMDMCEAP_Fig1_page01.png",
+      "fig_num": "1",
+      "page": 1,
+      "paper_num": "GDCMDMCEAP",
+      "aspect_ratio": 1.2741666666666667,
+      "fill_ratio": 0.04869795073032483,
+      "edge_sharpness": 1318.383544921875,
+      "white_border_fraction": 0.9877083333333333,
+      "text_contamination_ratio": 0.2683333333333333,
+      "pixel_intensity_std": 41.40428924560547,
+      "confidence_score": 0.65,
+      "classification": "GOOD",
+      "reason": "",
+      "suggested_adjustments": {
+        "expand_box": true,
+        "pad_extra_px": 20
+      }
+    },
+    {
+      "path": "C:\\Users\\tmouli\\Documents\\AI_trainig_data\\Vignesh\\ECCE_2026\\figures\\GDCMDMCEAP_Fig2_page03.png",
+      "fig_num": "2",
+      "page": 3,
+      "paper_num": "GDCMDMCEAP",
+      "aspect_ratio": 1.8567961165048543,
+      "fill_ratio": 0.36692286947141317,
+      "edge_sharpness": 1501.4285888671875,
+      "white_border_fraction": 0.9998786407766991,
+      "text_contamination_ratio": 0.5983009708737864,
+      "pixel_intensity_std": 42.30427551269531,
+      "confidence_score": 0.9,
+      "classification": "GOOD",
+      "reason": "",
+      "suggested_adjustments": {}
+    },
+    {
+      "path": "C:\\Users\\tmouli\\Documents\\AI_trainig_data\\Vignesh\\ECCE_2026\\figures\\GDCMDMCEAP_Fig3_page03.png",
+      "fig_num": "3",
+      "page": 3,
+      "paper_num": "GDCMDMCEAP",
+      "aspect_ratio": 1.7832167832167831,
+      "fill_ratio": 0.049022654905007845,
+      "edge_sharpness": 1791.8876953125,
+      "white_border_fraction": 0.9701427167603639,
+      "text_contamination_ratio": 0.5198135198135199,
+      "pixel_intensity_std": 39.64596939086914,
+      "confidence_score": 0.65,
+      "classification": "GOOD",
+      "reason": "",
+      "suggested_adjustments": {
+        "expand_box": true,
+        "pad_extra_px": 20
+      }
+    },
+    {
+      "path": "C:\\Users\\tmouli\\Documents\\AI_trainig_data\\Vignesh\\ECCE_2026\\figures\\GDCMDMCEAP_Fig4_page04.png",
+      "fig_num": "4",
+      "page": 4,
+      "paper_num": "GDCMDMCEAP",
+      "aspect_ratio": 1.207810320781032,
+      "fill_ratio": 0.04966968475911628,
+      "edge_sharpness": 1501.77197265625,
+      "white_border_fraction": 0.9894700139470014,
+      "text_contamination_ratio": 0.5481171548117155,
+      "pixel_intensity_std": 39.25883865356445,
+      "confidence_score": 0.65,
+      "classification": "GOOD",
+      "reason": "",
+      "suggested_adjustments": {
+        "expand_box": true,
+        "pad_extra_px": 20
+      }
+    },
+    {
+      "path": "C:\\Users\\tmouli\\Documents\\AI_trainig_data\\Vignesh\\ECCE_2026\\figures\\GDCMDMCEAP_Fig5_page04.png",
+      "fig_num": "5",
+      "page": 4,
+      "paper_num": "GDCMDMCEAP",
+      "aspect_ratio": 0.6924818840579711,
+      "fill_ratio": 0.05204453038359826,
+      "edge_sharpness": 1159.769287109375,
+      "white_border_fraction": 0.9999660326086957,
+      "text_contamination_ratio": 0.1947463768115942,
+      "pixel_intensity_std": 31.882152557373047,
+      "confidence_score": 0.9,
+      "classification": "GOOD",
+      "reason": "",
+      "suggested_adjustments": {}
+    },
+    {
+      "path": "C:\\Users\\tmouli\\Documents\\AI_trainig_data\\Vignesh\\ECCE_2026\\figures\\GDCMDMCEAP_Fig6_page05.png",
+      "fig_num": "6",
+      "page": 5,
+      "paper_num": "GDCMDMCEAP",
+      "aspect_ratio": 1.91125,
+      "fill_ratio": 0.05190729234793983,
+      "edge_sharpness": 1739.923583984375,
+      "white_border_fraction": 1.0,
+      "text_contamination_ratio": 0.5125,
+      "pixel_intensity_std": 39.64307403564453,
+      "confidence_score": 0.9,
+      "classification": "GOOD",
+      "reason": "",
+      "suggested_adjustments": {}
+    },
+    {
+      "path": "C:\\Users\\tmouli\\Documents\\AI_trainig_data\\Vignesh\\ECCE_2026\\figures\\GDCMDMCEAP_Fig7_page05.png",
+      "fig_num": "7",
+      "page": 5,
+      "paper_num": "GDCMDMCEAP",
+      "aspect_ratio": 1.4958217270194987,
+      "fill_ratio": 0.05323213146387389,
+      "edge_sharpness": 1819.7730712890625,
+      "white_border_fraction": 0.9930362116991643,
+      "text_contamination_ratio": 0.4554317548746518,
+      "pixel_intensity_std": 41.68733215332031,
+      "confidence_score": 0.9,
+      "classification": "GOOD",
+      "reason": "",
+      "suggested_adjustments": {}
+    }
+  ]
+}
