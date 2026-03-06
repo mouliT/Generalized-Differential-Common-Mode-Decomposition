@@ -562,15 +562,133 @@ This is the sole reason for the choice.
 \end{physbox}
 
 % ------------------------------------------------------------
-\subsection{Packing the Definitions into Transformation Matrices}
+\subsection{Building the Transformation Matrices: \texorpdfstring{$2{\times}2$}{2x2},
+            \texorpdfstring{$3{\times}3$}{3x3}, then General}
 % ------------------------------------------------------------
 
-The $N$ definitions above — $(N-1)$ DM pairs plus 1 CM — can be
-written as a single matrix equation.  Collect the original line
-currents into a column vector $\ivec = [i_1,\, i_2,\, \ldots,\, i_N]^T$
-and the decomposed quantities into
-$\iDCM = [i_{12},\, i_{23},\, \ldots,\, i_{(N-1)N},\, \icm]^T$.
-Then:
+A matrix is simply a compact way of writing several equations at once.
+Rather than presenting the general $N \times N$ matrix immediately,
+we build it up one size at a time so the structure is obvious before
+the notation becomes dense.
+
+% ---- Step 1: N = 2 ----
+\subsubsection*{Step 1 — Two lines ($N = 2$)}
+
+With 2 lines we need to encode 2 quantities: one DM (pair 1--2)
+and one CM.  The transformation matrices are $2 \times 2$:
+
+\[
+\mathbf{T}^{i}_{2} =
+\begin{bmatrix}
+\tfrac{1}{2} & -\tfrac{1}{2} \\[4pt]
+1 & 1
+\end{bmatrix},
+\qquad
+\mathbf{T}^{v}_{2} =
+\begin{bmatrix}
+1 & -1 \\[4pt]
+\tfrac{1}{2} & \tfrac{1}{2}
+\end{bmatrix}.
+\]
+
+Multiply out to verify:
+\[
+\mathbf{T}^{i}_{2}
+\begin{bmatrix} i_1 \\ i_2 \end{bmatrix}
+=
+\begin{bmatrix} \tfrac{i_1 - i_2}{2} \\ i_1 + i_2 \end{bmatrix}
+=
+\begin{bmatrix} i_{12} \\ \icm \end{bmatrix},
+\qquad
+\mathbf{T}^{v}_{2}
+\begin{bmatrix} v_{1P} \\ v_{2P} \end{bmatrix}
+=
+\begin{bmatrix} v_{1P} - v_{2P} \\ \tfrac{v_{1P}+v_{2P}}{2} \end{bmatrix}
+=
+\begin{bmatrix} v_{12} \\ \vcm \end{bmatrix}.
+\]
+
+Row~1 takes the scaled difference of the two currents
+(the DM definition).  Row~2 sums them (the CM definition).
+The two rows together account for all the information in $i_1$ and
+$i_2$ — nothing is lost.
+
+% ---- Step 2: N = 3 ----
+\subsubsection*{Step 2 — Three lines ($N = 3$)}
+
+With 3 lines we need to encode 3 quantities: DM pair 1--2,
+DM pair 2--3, and one CM.  The matrices grow to $3 \times 3$:
+
+\[
+\mathbf{T}^{i}_{3} =
+\begin{bmatrix}
+\tfrac{1}{2} & -\tfrac{1}{2} & 0 \\[4pt]
+0 & \tfrac{1}{2} & -\tfrac{1}{2} \\[4pt]
+1 & 1 & 1
+\end{bmatrix},
+\qquad
+\mathbf{T}^{v}_{3} =
+\begin{bmatrix}
+1 & -1 & 0 \\[4pt]
+0 & 1 & -1 \\[4pt]
+\tfrac{1}{3} & \tfrac{1}{3} & \tfrac{1}{3}
+\end{bmatrix}.
+\]
+
+Multiply out:
+\[
+\mathbf{T}^{i}_{3}
+\begin{bmatrix} i_1 \\ i_2 \\ i_3 \end{bmatrix}
+=
+\begin{bmatrix}
+\tfrac{i_1 - i_2}{2} \\[3pt]
+\tfrac{i_2 - i_3}{2} \\[3pt]
+i_1 + i_2 + i_3
+\end{bmatrix}
+=
+\begin{bmatrix} i_{12} \\ i_{23} \\ \icm \end{bmatrix},
+\qquad
+\mathbf{T}^{v}_{3}
+\begin{bmatrix} v_{1P} \\ v_{2P} \\ v_{3P} \end{bmatrix}
+=
+\begin{bmatrix}
+v_{1P} - v_{2P} \\[3pt]
+v_{2P} - v_{3P} \\[3pt]
+\tfrac{v_{1P}+v_{2P}+v_{3P}}{3}
+\end{bmatrix}
+=
+\begin{bmatrix} v_{12} \\ v_{23} \\ \vcm \end{bmatrix}.
+\]
+
+\begin{physbox}[Spotting the Pattern Across $N = 2$ and $N = 3$]
+Compare the two matrices side by side and notice:
+\begin{itemize}
+    \item \textbf{DM rows (all rows except the last):} Each DM row
+          has $+\tfrac{1}{2}$ on one column and $-\tfrac{1}{2}$ on
+          the next column (for $\TiN$), or $+1$ and $-1$
+          (for $\TvN$), and zeros everywhere else.  Row $k$ always
+          captures the \emph{adjacent} pair $(k,\, k+1)$.
+
+    \item \textbf{CM row (always the last row):} For $\TiN$ it is
+          all ones — sum all currents.  For $\TvN$ it is all
+          $\tfrac{1}{N}$ — average all voltages.
+
+    \item \textbf{Growing the matrix for larger $N$:} Adding a
+          fourth line just inserts one more DM row (for pair 3--4)
+          above the CM row, and shifts the CM-row weights from
+          $\tfrac{1}{3}$ to $\tfrac{1}{4}$.  The structure never
+          changes — only the size.
+\end{itemize}
+\end{physbox}
+
+% ---- Step 3: General N ----
+\subsubsection*{Step 3 — General $N$ lines (Equations (5)--(8) in the paper)}
+
+Now that the pattern is clear, the general form writes itself.
+Collect all line currents into
+$\ivec = [i_1,\,\ldots,\,i_N]^T$ and all decomposed quantities into
+$\iDCM = [i_{12},\,i_{23},\,\ldots,\,i_{(N-1)N},\,\icm]^T$,
+and likewise for voltages.  Then:
 
 \begin{eqnbox}[Transformation Equations — Equations (5) and (6)]
 \begin{align}
@@ -579,16 +697,16 @@ Then:
 \end{align}
 \end{eqnbox}
 
-Writing out the matrices in full (Equations (7) and (8) in the paper):
+where the $N \times N$ matrices are (Equations (7) and (8)):
 
 \begin{equation}
 \label{eq:TiN}
 \TiN =
 \begin{bmatrix}
-\frac{1}{\Ni} & -\frac{1}{\Ni} & 0 & \cdots & 0 & 0 \\
+\frac{1}{\Ni} & -\frac{1}{\Ni} & 0 & \cdots & 0 & 0 \\[4pt]
 0 & \frac{1}{\Ni} & -\frac{1}{\Ni} & \cdots & 0 & 0 \\
 \vdots & & \ddots & \ddots & & \vdots \\
-0 & 0 & \cdots & 0 & \frac{1}{\Ni} & -\frac{1}{\Ni} \\
+0 & 0 & \cdots & 0 & \frac{1}{\Ni} & -\frac{1}{\Ni} \\[4pt]
 1 & 1 & \cdots & 1 & 1 & 1
 \end{bmatrix}
 \end{equation}
@@ -597,86 +715,41 @@ Writing out the matrices in full (Equations (7) and (8) in the paper):
 \label{eq:TvN}
 \TvN =
 \begin{bmatrix}
-1 & -1 & 0 & \cdots & 0 & 0 \\
+1 & -1 & 0 & \cdots & 0 & 0 \\[4pt]
 0 & 1 & -1 & \cdots & 0 & 0 \\
 \vdots & & \ddots & \ddots & & \vdots \\
-0 & 0 & \cdots & 0 & 1 & -1 \\
+0 & 0 & \cdots & 0 & 1 & -1 \\[4pt]
 \frac{1}{N} & \frac{1}{N} & \cdots & \frac{1}{N} & \frac{1}{N} & \frac{1}{N}
 \end{bmatrix}
 \end{equation}
 
-\begin{physbox}[Reading the Matrix Structure]
-\begin{itemize}
-    \item \textbf{Rows 1 to $N-1$:} Each row picks out one DM pair.
-          Row $k$ subtracts line $k+1$ from line $k$ (scaled by
-          $1/\Ni$ for currents, unscaled for voltages).
-
-    \item \textbf{Last row:} Computes the CM quantity — sum of all
-          currents for $\TiN$, average of all voltages (weight $1/N$)
-          for $\TvN$.
-
-    \item \textbf{Invertibility:} Both matrices are square and
-          invertible, so the original line variables can always be
-          recovered from the decomposed set.
-\end{itemize}
-\end{physbox}
+Both matrices are square and invertible — the original $N$ line
+variables can always be recovered from the decomposed set.
 
 % ------------------------------------------------------------
-\subsection{Worked Example: \texorpdfstring{$N = 2$}{N = 2} Lines}
+\subsection{What the Inverse Gives You}
 % ------------------------------------------------------------
 
-With $N = 2$ and $\Ni = 2$ the matrices reduce to $2 \times 2$:
+Because the matrices are invertible, each original line current is
+the superposition of its CM and DM components.  For the $N = 2$
+case this is easy to compute directly:
 
-\[
-\mathbf{T}^{i}_{2} =
-\begin{bmatrix} \tfrac{1}{2} & -\tfrac{1}{2} \\ 1 & 1 \end{bmatrix},
-\qquad
-\mathbf{T}^{v}_{2} =
-\begin{bmatrix} 1 & -1 \\ \tfrac{1}{2} & \tfrac{1}{2} \end{bmatrix}.
-\]
-
-Applying the current transform:
-\[
-\iDCM = \mathbf{T}^{i}_{2}
-\begin{bmatrix} i_1 \\ i_2 \end{bmatrix}
-=
-\begin{bmatrix} \tfrac{i_1 - i_2}{2} \\ i_1 + i_2 \end{bmatrix}
-=
-\begin{bmatrix} i_{12} \\ \icm \end{bmatrix}.
-\]
-
-This is exactly the intuitive result: the DM current is half the
-difference of the two line currents, and the CM current is their sum.
-
-\begin{eqnbox}[Inverse Transform — Recovering Line Currents]
-Inverting gives the original line currents as a mix of DM and CM:
+\begin{eqnbox}[Recovering Line Currents from DM and CM ($N=2$)]
 \begin{align}
-    i_1 &= \icm + i_{12}
-           \quad\text{(CM plus DM)} \\
-    i_2 &= \icm - i_{12}
-           \quad\text{(CM minus DM)}
+    i_1 &= \icm + i_{12} \quad \text{(CM component + DM component)} \\
+    i_2 &= \icm - i_{12} \quad \text{(CM component $-$ DM component)}
 \end{align}
-Every line current is the superposition of a CM component
-(identical on both lines) and a DM component (equal and opposite).
-In a purely power-carrying circuit with no EMI leakage,
+Every line current is the sum of a CM part (identical on both wires)
+and a DM part (equal and opposite on the two wires).
+In a purely power-carrying circuit with no leakage to ground,
 $\icm = 0$ and $i_1 = -i_2 = i_{12}$.
 \end{eqnbox}
 
-Applying the voltage transform:
-\[
-\vDCM = \mathbf{T}^{v}_{2}
-\begin{bmatrix} v_{1P} \\ v_{2P} \end{bmatrix}
-=
-\begin{bmatrix} v_{1P} - v_{2P} \\ \tfrac{v_{1P} + v_{2P}}{2} \end{bmatrix}
-=
-\begin{bmatrix} v_{12} \\ \vcm \end{bmatrix}.
-\]
-
-The DM voltage $v_{12}$ is the line-to-line voltage (independent of
-where $P$ is), and the CM voltage $\vcm$ is the average of the two
-line-to-$P$ voltages (shifts with the choice of $P$, but always
-appears paired with $v_{Pg}$ in the CM equation so the
-ground-referenced quantity is always well-defined).
+The voltage inverse works the same way: the CM voltage $\vcm$ is the
+average line-to-$P$ voltage and the DM voltage $v_{12}$ is the
+line-to-line difference — both are independent of the specific
+choice of $P$, since $P$ cancels in the difference and is explicit
+in the CM equation via $v_{Pg}$.
 
 \begin{statebox}[Summary of \S1]
 \begin{itemize}
