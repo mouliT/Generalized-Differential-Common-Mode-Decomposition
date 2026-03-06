@@ -584,44 +584,55 @@ whose variables it encodes.
 
 \begin{figure}[H]
 \centering
-\begin{circuitikz}[american, scale=0.88, transform shape]
+\begin{circuitikz}[american, scale=0.82, transform shape]
 
   %--- Line 1 (y = 2) ---
   \draw (0,2) node[ocirc]{}
-        to[R, l=$R$] (2.5,2)
-        to[L, l=$L$] (5.0,2)
-        -- (6,2);
-  \draw[->>, thick] (0.25,2.42) -- (1.2,2.42)
+        to[R, l=$R$]  (2.5,2)
+        to[L, l=$L$]  (5.0,2)
+        -- (8.5,2);
+  \fill[black] (6.2,2) circle (2.2pt);               % branch junction for C_1
+  \draw[->, thick] (0.25,2.38) -- (1.1,2.38)
         node[midway, above, font=\small]{$i_1$};
+  \draw[->, thick] (7.1,2.38) -- (8.1,2.38)
+        node[midway, above, font=\small]{$i_1'$};
 
   %--- Line 2 (y = 0) ---
   \draw (0,0) node[ocirc]{}
         to[R, l_=$R$] (2.5,0)
         to[L, l_=$L$] (5.0,0)
-        -- (6,0);
-  \draw[->>, thick] (0.25,-0.42) -- (1.2,-0.42)
+        -- (8.5,0);
+  \fill[black] (6.9,0) circle (2.2pt);               % branch junction for C_2
+  \draw[->, thick] (0.25,-0.38) -- (1.1,-0.38)
         node[midway, below, font=\small]{$i_2$};
+  \draw[->, thick] (7.6,-0.38) -- (8.4,-0.38)
+        node[midway, below, font=\small]{$i_2'$};
 
-  %--- Shunt capacitors (each line to its own ground) ---
-  \draw (6,2) to[C, l=$C$]  (6, 0.6) node[ground]{};
-  \draw (6,0) to[C, l=$C$]  (6,-1.2) node[ground]{};
+  %--- Shunt capacitors — shared common ground bus ---
+  % C_1 at x = 6.2; its lower lead crosses line 2's wire (no dot = no connection)
+  \draw (6.2,2) to[C, l=$C$]  (6.2,-2.1);
+  % C_2 at x = 6.9
+  \draw (6.9,0) to[C, l_=$C$] (6.9,-2.1);
+  % Common ground bus connecting both cap bottoms
+  \draw (5.6,-2.1) -- (7.5,-2.1);
+  \draw (6.55,-2.1) node[ground]{};
 
-  %--- Floating reference P (below both lines) ---
-  \coordinate (Pnd) at (-1.4,-0.9);
-  \fill[black] (Pnd) circle (2.8pt);
+  %--- Floating reference P — NO physical wire to ground ---
+  \coordinate (Pnd) at (-1.5, 1.0);
+  \fill[black] (Pnd) circle (2.5pt);
   \node[left, font=\small\bfseries] at (Pnd) {$P$};
 
-  %--- v1P: dashed from line 1 terminal down to P ---
+  %--- v_{1P}: dashed voltage label from line 1 terminal to P ---
   \draw[dashed, thin] (0,2) -- (Pnd)
-        node[midway, right, font=\scriptsize]{$v_{1P}$};
+        node[pos=0.62, right, font=\scriptsize]{$v_{1P}$};
 
-  %--- v2P: dashed from line 2 terminal down to P ---
+  %--- v_{2P}: dashed voltage label from line 2 terminal to P ---
   \draw[dashed, thin] (0,0) -- (Pnd)
-        node[midway, right, font=\scriptsize]{$v_{2P}$};
+        node[pos=0.38, right, font=\scriptsize]{$v_{2P}$};
 
-  %--- v_Pg: from P to ground ---
-  \draw (Pnd) -- (-1.4,-1.8) node[ground]{};
-  \node[right, font=\scriptsize] at (-1.4,-1.35) {$v_{Pg}$};
+  %--- v_{Pg}: dashed — P is floating; dashed = voltage annotation, not a wire ---
+  \draw[dashed, thin] (Pnd) -- (-1.5,-2.1) node[ground]{};
+  \node[right, font=\scriptsize] at (-1.5,-0.3) {$v_{Pg}$};
 
   %--- Line labels ---
   \node[above, font=\footnotesize, color=gray!70!black] at (0,2) {Line 1};
@@ -629,11 +640,12 @@ whose variables it encodes.
 
 \end{circuitikz}
 \caption{Circuit for $N = 2$ lines.
-  The column vectors that enter the $2{\times}2$ transformation are
-  $\ivec  = [i_1,\;i_2]^T$ (line currents, left-to-right)
-  and $\vvec = [v_{1P},\;v_{2P}]^T$
-  (line-to-floating-reference voltages).
-  $P$ sits below both lines; $v_{Pg}$ is the only path from~$P$ to ground.}
+  Column vectors: $\ivec = [i_1,\;i_2]^T$ and $\vvec = [v_{1P},\;v_{2P}]^T$.
+  \textbf{$P$ is a floating reference} — no physical wire connects it to ground.
+  Dashed lines (including the one labeled $v_{Pg}$) are voltage annotations, not conductors.
+  Both shunt capacitors share a single common ground bus (solid horizontal bar at bottom).
+  Primed currents $i_n'$ exit the right side after the shunt-capacitor junction.
+  A wire crossing without a filled dot indicates no electrical connection.}
 \label{fig:ckt_N2}
 \end{figure}
 
@@ -688,66 +700,82 @@ making it the asymmetric line.
 
 \begin{figure}[H]
 \centering
-\begin{circuitikz}[american, scale=0.88, transform shape]
+\begin{circuitikz}[american, scale=0.82, transform shape]
 
   %--- Line 1 (y = 4) ---
   \draw (0,4) node[ocirc]{}
-        to[R, l=$R$] (2.5,4)
-        to[L, l=$L$] (5.0,4)
-        -- (6,4);
-  \draw[->>, thick] (0.25,4.42) -- (1.2,4.42)
+        to[R, l=$R$]  (2.5,4)
+        to[L, l=$L$]  (5.0,4)
+        -- (8.5,4);
+  \fill[black] (6.0,4) circle (2.2pt);               % branch junction for C_1
+  \draw[->, thick] (0.25,4.38) -- (1.1,4.38)
         node[midway, above, font=\small]{$i_1$};
+  \draw[->, thick] (7.0,4.38) -- (8.0,4.38)
+        node[midway, above, font=\small]{$i_1'$};
 
   %--- Line 2 (y = 2) ---
   \draw (0,2) node[ocirc]{}
-        to[R, l=$R$] (2.5,2)
-        to[L, l=$L$] (5.0,2)
-        -- (6,2);
-  \draw[->>, thick] (0.25,1.58) -- (1.2,1.58)
+        to[R, l=$R$]  (2.5,2)
+        to[L, l=$L$]  (5.0,2)
+        -- (8.5,2);
+  \fill[black] (6.8,2) circle (2.2pt);               % branch junction for C_2
+  \draw[->, thick] (0.25,1.62) -- (1.1,1.62)
         node[midway, below, font=\small]{$i_2$};
+  \draw[->, thick] (7.5,1.62) -- (8.3,1.62)
+        node[midway, below, font=\small]{$i_2'$};
 
   %--- Line 3 (y = 0) — asymmetric capacitance kC ---
   \draw (0,0) node[ocirc]{}
         to[R, l_=$R$] (2.5,0)
         to[L, l_=$L$] (5.0,0)
-        -- (6,0);
-  \draw[->>, thick] (0.25,-0.42) -- (1.2,-0.42)
+        -- (8.5,0);
+  \fill[black] (7.6,0) circle (2.2pt);               % branch junction for C_3
+  \draw[->, thick] (0.25,-0.38) -- (1.1,-0.38)
         node[midway, below, font=\small]{$i_3$};
+  \draw[->, thick] (8.0,-0.38) -- (8.5,-0.38)
+        node[midway, below, font=\small]{$i_3'$};
 
-  %--- Shunt capacitors ---
-  \draw (6,4) to[C, l=$C$]   (6, 2.7) node[ground]{};
-  \draw (6,2) to[C, l=$C$]   (6, 0.7) node[ground]{};
-  \draw (6,0) to[C, l=$kC$]  (6,-1.3) node[ground]{};
+  %--- Shunt capacitors — shared common ground bus ---
+  % C_1 at x = 6.0; lower lead crosses lines 2 and 3 (no dot = no connection)
+  \draw (6.0,4) to[C, l=$C$]   (6.0,-2.5);
+  % C_2 at x = 6.8; lower lead crosses line 3 (no dot = no connection)
+  \draw (6.8,2) to[C, l=$C$]   (6.8,-2.5);
+  % C_3 at x = 7.6 — asymmetric
+  \draw (7.6,0) to[C, l_=$kC$] (7.6,-2.5);
+  % Common ground bus
+  \draw (5.3,-2.5) -- (8.2,-2.5);
+  \draw (6.8,-2.5) node[ground]{};
 
-  %--- Floating reference P (below all lines) ---
-  \coordinate (Pnd) at (-1.4,-0.9);
-  \fill[black] (Pnd) circle (2.8pt);
+  %--- Floating reference P — NO physical wire to ground ---
+  \coordinate (Pnd) at (-1.5, 2.0);
+  \fill[black] (Pnd) circle (2.5pt);
   \node[left, font=\small\bfseries] at (Pnd) {$P$};
 
-  %--- Voltage dashed lines ---
+  %--- v_{1P}, v_{2P}, v_{3P}: dashed voltage labels ---
   \draw[dashed, thin] (0,4) -- (Pnd)
-        node[midway, right, font=\scriptsize]{$v_{1P}$};
+        node[pos=0.65, right, font=\scriptsize]{$v_{1P}$};
   \draw[dashed, thin] (0,2) -- (Pnd)
-        node[midway, right, font=\scriptsize]{$v_{2P}$};
+        node[midway, above, font=\scriptsize]{$v_{2P}$};
   \draw[dashed, thin] (0,0) -- (Pnd)
-        node[midway, right, font=\scriptsize]{$v_{3P}$};
+        node[pos=0.35, right, font=\scriptsize]{$v_{3P}$};
 
-  %--- v_Pg ---
-  \draw (Pnd) -- (-1.4,-1.8) node[ground]{};
-  \node[right, font=\scriptsize] at (-1.4,-1.35) {$v_{Pg}$};
+  %--- v_{Pg}: dashed — P is floating; dashed = voltage annotation, not a wire ---
+  \draw[dashed, thin] (Pnd) -- (-1.5,-2.5) node[ground]{};
+  \node[right, font=\scriptsize] at (-1.5, 0.6) {$v_{Pg}$};
 
   %--- Line labels ---
   \node[above, font=\footnotesize, color=gray!70!black] at (0,4) {Line 1};
   \node[above, font=\footnotesize, color=gray!70!black] at (0,2) {Line 2};
-  \node[below, font=\footnotesize, color=gray!70!black] at (0,0) {Line 3 (asymmetric, $kC$)};
+  \node[below, font=\footnotesize, color=gray!70!black] at (0,0) {Line 3\;($kC$, asymmetric)};
 
 \end{circuitikz}
 \caption{Circuit for $N = 3$ lines.
-  Line~3 is asymmetric: its shunt capacitance is $kC$ with $k < 1$,
-  while lines~1 and 2 each have capacitance~$C$.
-  The input vectors are
-  $\ivec = [i_1,\;i_2,\;i_3]^T$ and
-  $\vvec = [v_{1P},\;v_{2P},\;v_{3P}]^T$.}
+  Line~3 is asymmetric: shunt capacitance $kC$ with $k < 1$;
+  lines~1 and 2 each have capacitance~$C$.
+  Input vectors: $\ivec = [i_1,\;i_2,\;i_3]^T$ and $\vvec = [v_{1P},\;v_{2P},\;v_{3P}]^T$.
+  \textbf{$P$ is floating} (dashed lines are voltage annotations, not conductors).
+  All three caps share a single common ground bus.
+  Wire crossings without a filled dot indicate no connection.}
 \label{fig:ckt_N3}
 \end{figure}
 
