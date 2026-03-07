@@ -483,6 +483,31 @@ For the $N$-line system of \figref{fig:P1Fig1}, the CM quantities are:
 \end{align}
 \textbf{CM current} is the sum of all line currents.
 \textbf{CM voltage} is the average of all line-to-$P$ voltages.
+
+\medskip
+\textbf{Why a sum for current but an average for voltage?}
+
+\textit{Current:} By KCL at the ground node, the current that
+actually flows to ground equals $i_1 + i_2 + \cdots + i_N$ — the
+total imbalance.  A clamp-meter placed around all $N$ wires reads
+exactly this sum (DM currents cancel; CM currents add).  Dividing
+by $N$ would give a per-line average that no single instrument
+measures and that has no direct circuit meaning.
+
+\textit{Voltage:} The CM voltage should capture the
+``common level'' shared by all lines — the average is the natural
+definition.  The sum would grow with $N$ and lose physical meaning.
+
+\textit{The deeper reason — impedance consistency:}  For $N$
+symmetric lines each with resistance $R$, CM current divides
+equally across $N$ parallel branches, so the correct CM resistance
+is $R/N$.  With $\vcm = \frac{1}{N}\sum v_{nP}$ and
+$\icm = \sum i_n$, Ohm's law gives
+$Z_{\mathrm{CM}} = \vcm/\icm = R/N$ \checkmark.
+If instead $\icm$ were the average, $Z_{\mathrm{CM}}$ would
+come out as $R$ — as if $N$ parallel resistors were a single wire.
+The asymmetric definitions are precisely what keeps the transformed
+circuit elements physically correct.
 \end{eqnbox}
 
 These match the intuition from \S0: CM current is what you measure
