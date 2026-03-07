@@ -895,26 +895,172 @@ variables can always be recovered from the decomposed set.
 \subsection{What the Inverse Gives You}
 % ------------------------------------------------------------
 
-Because the matrices are invertible, each original line current is
-the superposition of its CM and DM components.  For the $N = 2$
-case this is easy to compute directly:
+The matrices $\TiN$ and $\TvN$ are invertible, so the mapping works
+in both directions: given the DM and CM quantities you can always
+recover the original per-line variables.  This section derives the
+recovery formulas for $N = 2$ and works through a numerical example
+for both currents and voltages.
 
-\begin{eqnbox}[Recovering Line Currents from DM and CM ($N=2$)]
+% ---- current inverse ----
+\subsubsection*{Deriving the Current Inverse ($N = 2$)}
+
+Start from the two forward equations:
+\[
+    i_{12} = \frac{i_1 - i_2}{2}
+    \qquad\text{and}\qquad
+    \icm   = i_1 + i_2.
+\]
+Rewrite the first as $i_1 - i_2 = 2\,i_{12}$.
+Add this to the second equation ($i_1 + i_2 = \icm$):
+\[
+    2\,i_1 = \icm + 2\,i_{12}
+    \;\;\Longrightarrow\;\;
+    \boxed{i_1 = \frac{\icm}{2} + i_{12}.}
+\]
+Subtract the rearranged first from the second:
+\[
+    2\,i_2 = \icm - 2\,i_{12}
+    \;\;\Longrightarrow\;\;
+    \boxed{i_2 = \frac{\icm}{2} - i_{12}.}
+\]
+
+\begin{eqnbox}[Recovering Line Currents from DM and CM ($N = 2$)]
 \begin{align}
-    i_1 &= \icm + i_{12} \quad \text{(CM component + DM component)} \\
-    i_2 &= \icm - i_{12} \quad \text{(CM component $-$ DM component)}
+    i_1 &= \frac{\icm}{2} + i_{12} \label{eq:inv_i1} \\[4pt]
+    i_2 &= \frac{\icm}{2} - i_{12} \label{eq:inv_i2}
 \end{align}
-Every line current is the sum of a CM part (identical on both wires)
-and a DM part (equal and opposite on the two wires).
-In a purely power-carrying circuit with no leakage to ground,
-$\icm = 0$ and $i_1 = -i_2 = i_{12}$.
+Each wire carries the \textbf{same CM share} ($\icm/2$: the total CM
+current distributed equally between the two lines) plus or minus the
+\textbf{DM current} $i_{12}$ (equal-and-opposite push-pull component).
 \end{eqnbox}
 
-The voltage inverse works the same way: the CM voltage $\vcm$ is the
-average line-to-$P$ voltage and the DM voltage $v_{12}$ is the
-line-to-line difference — both are independent of the specific
-choice of $P$, since $P$ cancels in the difference and is explicit
-in the CM equation via $v_{Pg}$.
+% ---- voltage inverse ----
+\subsubsection*{Deriving the Voltage Inverse ($N = 2$)}
+
+The forward voltage equations are:
+\[
+    v_{12} = v_{1P} - v_{2P}
+    \qquad\text{and}\qquad
+    \vcm   = \frac{v_{1P} + v_{2P}}{2}.
+\]
+Rewrite the second as $v_{1P} + v_{2P} = 2\,\vcm$.
+Add this to the first ($v_{1P} - v_{2P} = v_{12}$):
+\[
+    2\,v_{1P} = 2\,\vcm + v_{12}
+    \;\;\Longrightarrow\;\;
+    \boxed{v_{1P} = \vcm + \frac{v_{12}}{2}.}
+\]
+Subtract the first from the second rearrangement:
+\[
+    2\,v_{2P} = 2\,\vcm - v_{12}
+    \;\;\Longrightarrow\;\;
+    \boxed{v_{2P} = \vcm - \frac{v_{12}}{2}.}
+\]
+
+\begin{eqnbox}[Recovering Line Voltages from DM and CM ($N = 2$)]
+\begin{align}
+    v_{1P} &= \vcm + \frac{v_{12}}{2} \label{eq:inv_v1P} \\[4pt]
+    v_{2P} &= \vcm - \frac{v_{12}}{2} \label{eq:inv_v2P}
+\end{align}
+Each line-to-$P$ voltage is the shared CM voltage (common to both
+wires) plus or minus half the DM voltage.
+\end{eqnbox}
+
+% ---- worked example: currents ----
+\subsubsection*{Worked Example — Currents}
+
+\textbf{Scenario.}  A two-wire cable carries 8\,A of DC load current
+to a resistive load.  Parasitic module capacitances leak a total of
+0.4\,A of common-mode current to ground.  Find the ammeter reading
+on each wire and verify.
+
+\textbf{Given:} $i_{12} = 8\,\text{A}$,\quad $\icm = 0.4\,\text{A}$.
+
+\textbf{Step 1 — apply the inverse:}
+\[
+    i_1 = \frac{\icm}{2} + i_{12}
+        = \frac{0.4}{2} + 8
+        = 0.2 + 8
+        = 8.2\,\text{A}
+\]
+\[
+    i_2 = \frac{\icm}{2} - i_{12}
+        = 0.2 - 8
+        = -7.8\,\text{A}
+\]
+
+\textbf{Step 2 — verify by re-applying the forward transform:}
+\[
+    i_{12} = \frac{i_1 - i_2}{2}
+           = \frac{8.2 - (-7.8)}{2}
+           = \frac{16}{2}
+           = 8\,\text{A} \checkmark
+\]
+\[
+    \icm = i_1 + i_2 = 8.2 + (-7.8) = 0.4\,\text{A} \checkmark
+\]
+
+\begin{physbox}[Reading the Numbers]
+Line~1 carries 8.2\,A forward and line~2 carries 7.8\,A return.
+The 0.4\,A imbalance ($8.2 - 7.8 = 0.4$\,A) is $\icm$: it left
+line~1 and did not return on line~2 — it leaked to ground through
+the parasitic capacitance.  This is exactly the conducted-EMI
+current that the LISN would measure.  In a perfectly symmetric
+system ($\icm = 0$) both wires would read exactly $\pm\,8$\,A.
+\end{physbox}
+
+% ---- worked example: voltages ----
+\subsubsection*{Worked Example — Voltages}
+
+\textbf{Scenario.}  The same cable has a 600\,V line-to-line voltage
+($v_{12} = 600\,\text{V}$) and a common-mode voltage
+$\vcm = 300\,\text{V}$ (the average of both lines sits 300\,V above
+the floating reference~$P$).  Find $v_{1P}$ and $v_{2P}$.
+
+\textbf{Given:} $v_{12} = 600\,\text{V}$,\quad $\vcm = 300\,\text{V}$.
+
+\textbf{Step 1 — apply the inverse:}
+\[
+    v_{1P} = \vcm + \frac{v_{12}}{2}
+           = 300 + \frac{600}{2}
+           = 300 + 300
+           = 600\,\text{V}
+\]
+\[
+    v_{2P} = \vcm - \frac{v_{12}}{2}
+           = 300 - 300
+           = 0\,\text{V}
+\]
+
+\textbf{Step 2 — verify:}
+\[
+    v_{12} = v_{1P} - v_{2P} = 600 - 0 = 600\,\text{V} \checkmark
+\]
+\[
+    \vcm = \frac{v_{1P} + v_{2P}}{2}
+         = \frac{600 + 0}{2}
+         = 300\,\text{V} \checkmark
+\]
+
+\begin{physbox}[Why $v_{2P} = 0$\,V?]
+Line~2 coincides with the floating reference~$P$ in this example
+($v_{2P} = 0$) — not because of any special circuit property, but
+because $\vcm = v_{12}/2$ for the chosen numbers.  A different CM
+voltage would place $P$ at a different level between the two lines.
+Notice that neither calculation required knowing $v_{Pg}$ (the
+voltage from $P$ to ground): once $P$ is chosen, all DM and CM
+quantities are determined independently of ground.
+\end{physbox}
+
+\begin{warningbox}[The Factor of $N$ in the CM Share]
+Because $\icm = i_1 + i_2$ is the \emph{total} CM current
+(the sum, per Eq.~\ref{eq:icm}), the per-line CM contribution is
+$\icm/N = \icm/2$ for $N = 2$.  A common mistake is to write
+$i_1 = \icm + i_{12}$, forgetting the $1/2$.  Check: with that
+wrong formula $i_1 + i_2 = 2\icm \neq \icm$ — the CM current
+double-counts.  The correct rule is:
+\emph{the total CM current is shared equally among all $N$ lines.}
+\end{warningbox}
 
 \begin{statebox}[Summary of \S1]
 \begin{itemize}
