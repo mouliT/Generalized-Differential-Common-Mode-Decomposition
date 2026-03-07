@@ -1380,6 +1380,235 @@ it links $i_{12}$ and $\icm$ bidirectionally.
 \end{itemize}
 \end{warningbox}
 
+% ------------------------------------------------------------
+\subsection{Numerical Proof — The 2\texorpdfstring{$\times$}{×}2
+            Case Study}
+% ------------------------------------------------------------
+
+The algebra of \S2.1--\S2.4 shows \emph{why} the coupling term exists.
+The most direct verification is a concrete number: start from
+Eq.~\eqref{eq:Sdcm}, pick real component values, and check whether
+a DM excitation alone can produce a CM current.
+
+\medskip
+\textbf{The question we answer:}
+\begin{center}
+\emph{Apply a 1\,V sinusoidal DM voltage with no CM source.
+      How much CM current flows?}
+\end{center}
+If the answer is zero the modes are decoupled; if non-zero, then a
+DM switching waveform is generating conducted EMI by itself — with
+no CM voltage source required.
+
+\subsubsection*{Setup (using \S1 notation throughout)}
+
+Recall from \S1.5 that the $N = 2$ decomposition encodes:
+$i_{12} = (i_1 - i_2)/2$ (DM) and $\icm = i_1 + i_2$ (CM),
+with the same split for voltages.
+We now work entirely in this DM--CM coordinate system.
+
+Choose the simplest parameter set that isolates the capacitor effect:
+
+\begin{itemize}
+    \item \textbf{Shunt capacitances:} $C = 1\,\text{nF}$ for
+          line~1; $kC$ for line~2 (the asymmetric cap introduced
+          in \figref{fig:P1Fig1}).
+    \item \textbf{DM excitation:} $V_{12} = 1\angle 0°\,\text{V}$
+          at $f = 1\,\text{MHz}$ ($\omega = 2\pi f \approx
+          6.28 \times 10^6\,\text{rad/s}$).  Phasor notation:
+          $p \to j\omega$.
+    \item \textbf{No CM source:} $V_{\mathrm{CM}} = 0$ and
+          $V_{Pg} = 0$.  This is the critical choice — we want
+          to see whether DM alone drives $\icm$.
+    \item \textbf{Series elements:} $R = L = 0$ to isolate the
+          capacitor contribution.  (Including $R$ and $L$ only
+          adds the diagonal matrix $\mathbf{M}$ from \S2.2 —
+          diagonal matrices never couple DM to CM, so they
+          cannot change the conclusion.)
+\end{itemize}
+
+With $R = L = 0$ and $p \to j\omega$, Eq.~\eqref{eq:DCMeqn}
+reduces to
+$\mathbf{S}_{\mathrm{DCM}}/(j\omega) \cdot \mathbf{I}_{\mathrm{DCM}}
+= \mathbf{V}_{\mathrm{DCM}}$.
+Substituting Eq.~\eqref{eq:Sdcm} gives the phasor system we will
+solve twice — once for $k = 1$ and once for $k = 0.5$:
+
+\begin{eqnbox}[2-Line Phasor System Under Pure DM Excitation]
+\begin{equation}
+\frac{1}{j\omega C}
+\begin{bmatrix}
+    \dfrac{k+1}{k}  & \dfrac{k-1}{2k} \\[10pt]
+    \dfrac{k-1}{2k} & \dfrac{k+1}{4k}
+\end{bmatrix}
+\begin{bmatrix} I_{12} \\[4pt] I_{\mathrm{CM}} \end{bmatrix}
+=
+\begin{bmatrix} 1\,\mathrm{V} \\[4pt] 0 \end{bmatrix}
+\label{eq:num_sys}
+\end{equation}
+Right-hand side: $[V_{12},\;V_{\mathrm{CM}}+V_{Pg}]^T = [1\,\mathrm{V},\;0]^T$.
+A non-zero $I_{\mathrm{CM}}$ in the solution means the DM voltage
+alone is generating CM current — the definition of asymmetry-induced
+EMI.
+\end{eqnbox}
+
+% ---- Case A ----
+\subsubsection*{Case A — Symmetric ($k = 1$): modes stay silent}
+
+Substitute $k = 1$.  The off-diagonal of Eq.~\eqref{eq:Sdcm}
+becomes $\tfrac{k-1}{2k}\big|_{k=1} = 0$, so
+Eq.~\eqref{eq:num_sys} becomes:
+\[
+\frac{1}{j\omega C}
+\begin{bmatrix} 2 & 0 \\ 0 & \tfrac{1}{2} \end{bmatrix}
+\begin{bmatrix} I_{12} \\ I_{\mathrm{CM}} \end{bmatrix}
+=
+\begin{bmatrix} 1\,\mathrm{V} \\ 0 \end{bmatrix}.
+\]
+The matrix is block-diagonal: \textbf{Row 1 and Row 2 are
+completely independent.}  Row 2 alone gives:
+\[
+    \frac{1}{2j\omega C}\,I_{\mathrm{CM}} = 0
+    \quad\Longrightarrow\quad
+    \boxed{I_{\mathrm{CM}} = 0.}
+\]
+This holds for \emph{any} value of $V_{12}$.  The DM source is
+completely invisible to the CM equation.  Row 1 gives
+$I_{12} = j\omega C \cdot V_{12}/2$ (a nonzero DM current that
+circulates inside the wire bundle), but it drives zero ground
+current — exactly Eq.~\eqref{eq:DM_sym}.
+
+\begin{statebox}[What Decoupling Means in Practice]
+With $k = 1$, no matter how large or fast the DM switching
+transient is, $\icm = 0$ and no asymmetry-induced EMI reaches the
+LISN.  The only remaining EMI path is $V_{Pg}$ on the right-hand
+side of Eq.~\eqref{eq:CM_sym} — driven by the CM voltage of the
+power source, not by the DM switching waveform.
+\end{statebox}
+
+% ---- Case B ----
+\subsubsection*{Case B — Asymmetric ($k = 0.5$): DM drives CM current}
+
+SiC power-module source terminals typically have roughly half the
+parasitic capacitance of the drain terminal (see \S0.5), making
+$k \approx 0.5$ a realistic value.
+Substitute $k = 0.5$ into Eq.~\eqref{eq:Sdcm}:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{lcc}
+\toprule
+Matrix entry & Formula & Value at $k = 0.5$ \\
+\midrule
+DM self-elastance  & $(k+1)/k$    & $1.5/0.5 = 3$ \\
+Coupling (off-diag) & $(k-1)/(2k)$ & $-0.5/1.0 = -\,0.5$ \\
+CM self-elastance  & $(k+1)/(4k)$ & $1.5/2.0 = 0.75$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The phasor system (Eq.~\ref{eq:num_sys}) becomes:
+\[
+\frac{1}{j\omega C}
+\begin{bmatrix} 3 & -0.5 \\ -0.5 & 0.75 \end{bmatrix}
+\begin{bmatrix} I_{12} \\ I_{\mathrm{CM}} \end{bmatrix}
+=
+\begin{bmatrix} 1\,\mathrm{V} \\ 0 \end{bmatrix}.
+\]
+
+\textbf{Step 1 — solve Row 2 for $I_{\mathrm{CM}}$:}
+\[
+    -0.5\,I_{12} + 0.75\,I_{\mathrm{CM}} = 0
+    \quad\Longrightarrow\quad
+    I_{\mathrm{CM}} = \frac{0.5}{0.75}\,I_{12} = \frac{2}{3}\,I_{12}.
+\]
+The CM and DM currents are locked together by the off-diagonal term.
+
+\textbf{Step 2 — substitute into Row 1:}
+\[
+    3\,I_{12} + (-0.5)\cdot\tfrac{2}{3}\,I_{12}
+    = j\omega C \cdot 1\,\mathrm{V}
+    \;\;\Longrightarrow\;\;
+    \Bigl(3 - \tfrac{1}{3}\Bigr)I_{12} = j\omega C
+    \;\;\Longrightarrow\;\;
+    \frac{8}{3}\,I_{12} = j\omega C.
+\]
+\[
+    I_{12} = j\omega C \cdot \frac{3}{8}.
+\]
+
+\textbf{Step 3 — back-substitute to get $I_{\mathrm{CM}}$:}
+\[
+    I_{\mathrm{CM}}
+    = \frac{2}{3}\,I_{12}
+    = \frac{2}{3} \cdot j\omega C \cdot \frac{3}{8}
+    = \frac{j\omega C}{4}.
+\]
+
+\begin{eqnbox}[CM Current Generated by a Pure DM Source ($k=0.5$, $N=2$)]
+\begin{equation}
+    I_{\mathrm{CM}} = \frac{j\omega C}{4}\cdot V_{12}
+    \label{eq:ICM_result}
+\end{equation}
+\end{eqnbox}
+
+\textbf{Plug in numbers:} $C = 1\,\text{nF}$, $f = 1\,\text{MHz}$,
+$V_{12} = 1\,\text{V}$:
+\[
+|I_{\mathrm{CM}}|
+= \frac{2\pi \times 10^6 \times 10^{-9}}{4}
+= \frac{6.28 \times 10^{-3}}{4}
+\approx \mathbf{1.57\,\text{mA}}.
+\]
+A 1\,V DM voltage at 1\,MHz with $k = 0.5$ produces
+\textbf{1.57\,mA of CM current} — with no CM source, no $V_{Pg}$,
+purely from the capacitor mismatch.
+
+\begin{warningbox}[Connecting Back to \S1: What Does 1.57\,mA Mean?]
+From \S1.6 (Eq.~\ref{eq:inv_i1}) each line carries $\icm/2$ as its
+CM share.  So $I_{\mathrm{CM}} = 1.57\,\text{mA}$ means line~1
+carries $0.785\,\text{mA}$ more than line~2.  That imbalance is the
+\emph{same current} that the $\icm$ definition (Eq.~\ref{eq:icm})
+would measure with a clamp-meter around both wires — exactly the
+conducted EMI the LISN captures (recall \S0.4).
+The DM switching waveform acts as the pump; the capacitor
+mismatch ($k \neq 1$) is the valve that lets a fraction of it
+escape to the ground return.
+\end{warningbox}
+
+\begin{statebox}[Side-by-Side Summary: $k = 1$ vs.\ $k = 0.5$]
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Quantity}
+    & $k = 1$ (symmetric)
+    & $k = 0.5$ (asymmetric) \\
+\midrule
+Off-diag of $\mathbf{S}_{\mathrm{DCM}}$
+    & $0$ & $-0.5/C$ \\
+Equations coupled?
+    & No  & Yes \\
+$I_{12}$ (DM current)
+    & $j\omega C/2$
+    & $j\omega C \cdot 3/8$ \\
+$I_{\mathrm{CM}}$ given $V_{12}=1\,\text{V}$, $V_{\mathrm{CM}}=0$
+    & $0$
+    & $j\omega C/4$ \\
+$|I_{\mathrm{CM}}|$ at $C=1\,\text{nF}$, $f = 1\,\text{MHz}$
+    & $0\,\text{mA}$
+    & $1.57\,\text{mA}$ \\
+Asymmetry-induced EMI?
+    & \textbf{None}
+    & \textbf{Yes — from DM alone} \\
+\bottomrule
+\end{tabular}
+\end{center}
+Same DM excitation, identical $R$, $L$, $C$ values — only the
+ratio $k$ changed.  The CM current jumps from zero to 1.57\,mA.
+This is the numerical proof of the opening paragraph's claim.
+\end{statebox}
+
 \begin{physbox}[The Big Picture]
 The transformation matrices $\TiN$ and $\TvN$ have now done their
 full job.  They converted the messy $N \times N$ mixed-mode
