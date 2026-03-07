@@ -1082,9 +1082,322 @@ double-counts.  The correct rule is:
 % SECTIONS 2–5 — TO BE WRITTEN ONE AT A TIME
 % ============================================================
 
-% \section{How Asymmetry Couples the Two Modes}
-% TODO: §2 — N-line MM equations (Eq. 9), applying transform (Eq. 10),
-%            symmetric decoupled case (Eqs. 14-15), asymmetric S matrix (Eq. 16)
+% ============================================================
+\section{How Asymmetry Couples the Two Modes}
+% ============================================================
+
+Section~1 defined the DM/CM quantities and built the transformation
+matrices.  Now we put those matrices to work on the actual circuit
+equations.  The central question is:
+
+\begin{center}
+\emph{If you apply $\TiN$ and $\TvN$ to the $N$-line circuit
+equations, what structure emerges — and what changes when one
+capacitor is $kC$ instead of $C$?}
+\end{center}
+
+The answer splits into two cases.  For a \emph{symmetric} system
+($k = 1$, all capacitors equal) the transformed equations break
+into $N-1$ independent DM equations and one CM equation — the two
+modes are electrically invisible to each other.  For an
+\emph{asymmetric} system ($k \neq 1$) the capacitor mismatch
+injects a coupling term: a DM voltage oscillation drives a CM
+current directly.  This DM-to-CM conversion is the root cause of
+asymmetry-induced conducted EMI.
+
+% ------------------------------------------------------------
+\subsection{The N-Line Circuit Equations}
+% ------------------------------------------------------------
+
+Refer back to the general model of \figref{fig:P1Fig1}.
+For line~$n$, KVL from the left input terminal through the series
+$R$--$L$ and the shunt capacitor to ground gives:
+\[
+    v_{nP} + v_{Pg}
+    = \Bigl(R + pL + \frac{S_n}{p}\Bigr)\,i_n,
+    \qquad S_n = \frac{1}{C_n},
+\]
+where $p = d/dt$ is the Heaviside operator and $S_n$ is the
+\emph{elastance} (reciprocal capacitance) of line $n$'s shunt element.
+
+\begin{physbox}[Why Elastance?]
+Writing $S_n/p$ instead of $1/(pC_n)$ separates the circuit
+parameter ($S_n$) from the integrating operator ($1/p$), making
+the matrix algebra cleaner.  The elastance matrix $\mathbf{S}_N$
+collects all $N$ shunt-cap parameters into a single object.
+\end{physbox}
+
+Stacking $N$ such equations into column-vector form:
+
+\begin{eqnbox}[Mixed-Mode Circuit Equations — Eq.~9 in paper]
+\begin{equation}
+    \mathbf{Z}\,\mathbf{i}
+    = \mathbf{v}_{nP} + v_{Pg}\,\mathbf{1}_N
+    \label{eq:MMeqn}
+\end{equation}
+where the impedance operator matrix and the elastance matrix are
+\[
+    \mathbf{Z}
+    = (R + pL)\,\mathbf{I}_N + \frac{1}{p}\,\mathbf{S}_N,
+    \qquad
+    \mathbf{S}_N
+    = \operatorname{diag}\!\Bigl(
+        \underbrace{\tfrac{1}{C},\;\ldots,\;\tfrac{1}{C}}_{N-1},\;
+        \tfrac{1}{kC}
+      \Bigr),
+\]
+and $\mathbf{1}_N = [1,\ldots,1]^T$,\;
+$\mathbf{i} = [i_1,\ldots,i_N]^T$,\;
+$\mathbf{v}_{nP} = [v_{1P},\ldots,v_{NP}]^T$.
+\end{eqnbox}
+
+\begin{statebox}[Two Observations About $\mathbf{Z}$]
+\begin{itemize}
+    \item $(R + pL)\,\mathbf{I}_N$ — every line has the same $R$
+          and $L$, so this is a scalar multiple of the identity.
+          It will transform cleanly.
+    \item $\mathbf{S}_N$ — diagonal, but \emph{not} proportional
+          to the identity when $k \neq 1$.  This is the \textbf{only}
+          asymmetric object in the equation and the only source of
+          DM--CM coupling after transformation.
+\end{itemize}
+\end{statebox}
+
+% ------------------------------------------------------------
+\subsection{Applying the DM--CM Transformation}
+% ------------------------------------------------------------
+
+Multiply Eq.~\eqref{eq:MMeqn} on the left by $\TvN$, then
+substitute $\mathbf{i} = (\TiN)^{-1}\iDCM$:
+\[
+    \underbrace{\TvN\,\mathbf{Z}\,(\TiN)^{-1}}_{\mathbf{Z}_{\mathrm{DCM}}}
+    \;\iDCM
+    \;=\;
+    \vDCM
+    \;+\; v_{Pg}\,\underbrace{\TvN\,\mathbf{1}_N}_{\mathbf{e}_N}.
+\]
+
+\begin{eqnbox}[DCM Equations — Eq.~10 in paper]
+\begin{equation}
+    \mathbf{Z}_{\mathrm{DCM}}\,\iDCM
+    = \vDCM + v_{Pg}\,\mathbf{e}_N
+    \label{eq:DCMeqn}
+\end{equation}
+where $\mathbf{Z}_{\mathrm{DCM}} = \TvN\,\mathbf{Z}\,(\TiN)^{-1}$
+and $\mathbf{e}_N = [0,\ldots,0,1]^T$ is the $N$-th unit vector.
+\end{eqnbox}
+
+\subsubsection*{Why $\TvN\,\mathbf{1}_N = \mathbf{e}_N$}
+
+Verify for $N = 2$:
+\[
+\TvN\,\mathbf{1}_2
+=
+\begin{bmatrix}
+1 & -1 \\ \tfrac{1}{2} & \tfrac{1}{2}
+\end{bmatrix}
+\begin{bmatrix}1 \\ 1\end{bmatrix}
+=
+\begin{bmatrix}1-1 \\ \tfrac{1}{2}+\tfrac{1}{2}\end{bmatrix}
+=
+\begin{bmatrix}0 \\ 1\end{bmatrix}
+= \mathbf{e}_2.
+\]
+Every DM row of $\TvN$ has a $+1$ and a $-1$ in adjacent columns
+(difference of a constant = 0); the CM row has all $+1/N$ (sum = 1).
+
+\begin{statebox}[$v_{Pg}$ Lives Only in the CM Equation]
+Because $v_{Pg}$ is multiplied by $\mathbf{e}_N$, it appears in the
+\textbf{CM equation only} — absent from every DM equation.
+DM quantities are completely independent of the ground connection.
+This confirms the physical intuition: DM current is a loop current
+confined to the wire bundle; only the CM path connects to ground
+through $v_{Pg}$.
+\end{statebox}
+
+\subsubsection*{Expanding $\mathbf{Z}_{\mathrm{DCM}}$}
+
+Since $\mathbf{Z} = (R + pL)\,\mathbf{I}_N + (1/p)\,\mathbf{S}_N$,
+linearity gives:
+\[
+    \mathbf{Z}_{\mathrm{DCM}}
+    = (R + pL)\underbrace{\TvN(\TiN)^{-1}}_{\displaystyle\mathbf{M}}
+    + \frac{1}{p}\underbrace{\TvN\,\mathbf{S}_N\,(\TiN)^{-1}}
+                             {\displaystyle\mathbf{S}_{\mathrm{DCM}}}.
+\]
+
+\paragraph{$\mathbf{M} = \TvN(\TiN)^{-1}$ is always diagonal.}
+
+Computing for $N = 2$:
+\[
+    (\TiN)^{-1}
+    = \begin{bmatrix}1 & \tfrac{1}{2} \\[3pt] -1 & \tfrac{1}{2}\end{bmatrix},
+    \qquad
+    \mathbf{M}
+    =
+    \begin{bmatrix}1 & -1 \\[3pt] \tfrac{1}{2} & \tfrac{1}{2}\end{bmatrix}
+    \begin{bmatrix}1 & \tfrac{1}{2} \\[3pt] -1 & \tfrac{1}{2}\end{bmatrix}
+    =
+    \begin{bmatrix}2 & 0 \\[3pt] 0 & \tfrac{1}{2}\end{bmatrix}.
+\]
+
+The entries are $\Ni = 2$ for the DM row and $1/N = 1/2$ for the CM
+row.  For all $N$:
+$\mathbf{M} = \operatorname{diag}(\Ni,\ldots,\Ni,\,1/N)$.
+
+\begin{circuitbox}[Physical Meaning of $\mathbf{M}$]
+\begin{itemize}
+    \item DM: $R_{\mathrm{DM}} = \Ni R = 2R$,\; $L_{\mathrm{DM}} = 2L$
+          — DM current flows through both $R$'s in series. \checkmark
+    \item CM: $R_{\mathrm{CM}} = R/N = R/2$,\; $L_{\mathrm{CM}} = L/2$
+          — CM current splits equally across both lines in parallel. \checkmark
+    \item \textbf{No off-diagonal entries.}  $R$ and $L$ never couple
+          DM to CM regardless of capacitor asymmetry.
+\end{itemize}
+\end{circuitbox}
+
+\paragraph{$\mathbf{S}_{\mathrm{DCM}} = \TvN\,\mathbf{S}_N\,(\TiN)^{-1}$
+depends on $k$.}
+
+This is the key computation.  For $N = 2$ with
+$\mathbf{S}_2 = \operatorname{diag}(1/C,\;1/(kC))$:
+
+\textbf{Stage A} — left-multiply by $\TvN$:
+\[
+\begin{bmatrix}1 & -1 \\[3pt] \tfrac{1}{2} & \tfrac{1}{2}\end{bmatrix}
+\begin{bmatrix}\tfrac{1}{C} & 0 \\[3pt] 0 & \tfrac{1}{kC}\end{bmatrix}
+=
+\begin{bmatrix}
+    \tfrac{1}{C}  & -\tfrac{1}{kC} \\[6pt]
+    \tfrac{1}{2C} & \tfrac{1}{2kC}
+\end{bmatrix}.
+\]
+
+\textbf{Stage B} — right-multiply by $(\TiN)^{-1}$:
+\[
+\begin{bmatrix}
+    \tfrac{1}{C}  & -\tfrac{1}{kC} \\[6pt]
+    \tfrac{1}{2C} & \tfrac{1}{2kC}
+\end{bmatrix}
+\begin{bmatrix}1 & \tfrac{1}{2} \\[3pt] -1 & \tfrac{1}{2}\end{bmatrix}
+=
+\frac{1}{C}
+\begin{bmatrix}
+    \dfrac{k+1}{k}  & \dfrac{k-1}{2k}  \\[10pt]
+    \dfrac{k-1}{2k} & \dfrac{k+1}{4k}
+\end{bmatrix}.
+\]
+
+\begin{eqnbox}[DCM Elastance Matrix ($N = 2$) — Eq.~16 in paper]
+\begin{equation}
+\mathbf{S}_{\mathrm{DCM}}
+= \frac{1}{C}
+  \begin{bmatrix}
+      \dfrac{k+1}{k}  & \dfrac{k-1}{2k}  \\[10pt]
+      \dfrac{k-1}{2k} & \dfrac{k+1}{4k}
+  \end{bmatrix}
+\label{eq:Sdcm}
+\end{equation}
+Off-diagonal entry $\tfrac{1}{C}\cdot\tfrac{k-1}{2k}$ is the
+\textbf{DM--CM coupling elastance}.
+It is zero if and only if $k = 1$.
+\end{eqnbox}
+
+% ------------------------------------------------------------
+\subsection{Case 1 — Symmetric ($k = 1$): Modes Fully Decouple}
+% ------------------------------------------------------------
+
+Substituting $k = 1$ into Eq.~\eqref{eq:Sdcm}:
+\[
+\mathbf{S}_{\mathrm{DCM}}\big|_{k=1}
+=
+\frac{1}{C}\begin{bmatrix}2 & 0 \\ 0 & \tfrac{1}{2}\end{bmatrix}.
+\]
+Off-diagonal = 0.  The two rows of Eq.~\eqref{eq:DCMeqn} are
+completely independent:
+
+\begin{eqnbox}[Symmetric Decoupled Equations — Eqs.~14 and 15 in paper]
+\begin{align}
+    \Bigl(2R + 2pL + \frac{2}{pC}\Bigr)\,i_{12}
+        &= v_{12}
+        \label{eq:DM_sym} \\[6pt]
+    \Bigl(\frac{R}{2} + \frac{pL}{2} + \frac{1}{2pC}\Bigr)\,\icm
+        &= \vcm + v_{Pg}
+        \label{eq:CM_sym}
+\end{align}
+\end{eqnbox}
+
+\begin{circuitbox}[Reading the Symmetric Equations]
+\begin{itemize}
+    \item \textbf{DM (Eq.~\ref{eq:DM_sym}):} $i_{12}$ sees
+          \emph{series} elements — $2R$, $2L$, and elastance $2/C$
+          (two capacitors $C$ in series give $C/2$, elastance $2/C$).
+          No $v_{Pg}$ — DM is ground-independent.
+    \item \textbf{CM (Eq.~\ref{eq:CM_sym}):} $\icm$ sees
+          \emph{parallel} elements — $R/2$, $L/2$, and elastance
+          $1/(2C)$ (two $C$'s in parallel give $2C$, elastance $1/(2C)$).
+          $v_{Pg}$ drives the CM current — this is the EMI path.
+    \item \textbf{No coupling:} a DM voltage source excites zero CM
+          current, and vice versa.  This is the ideal symmetric world.
+\end{itemize}
+\end{circuitbox}
+
+% ------------------------------------------------------------
+\subsection{Case 2 — Asymmetric ($k \neq 1$): Coupling Appears}
+% ------------------------------------------------------------
+
+With $k \neq 1$, the off-diagonal entries of $\mathbf{S}_{\mathrm{DCM}}$
+are non-zero.  Expanding Eq.~\eqref{eq:DCMeqn} row by row:
+
+\begin{eqnbox}[Asymmetric Coupled Equations ($N = 2$)]
+\begin{align}
+    \Bigl(2R + 2pL + \frac{k+1}{kpC}\Bigr)\,i_{12}
+    + \frac{k-1}{2kpC}\,\icm
+        &= v_{12}
+        \label{eq:DM_asym} \\[6pt]
+    \frac{k-1}{2kpC}\,i_{12}
+    + \Bigl(\frac{R}{2} + \frac{pL}{2} + \frac{k+1}{4kpC}\Bigr)\,\icm
+        &= \vcm + v_{Pg}
+        \label{eq:CM_asym}
+\end{align}
+\end{eqnbox}
+
+The term $\tfrac{k-1}{2kpC}$ appears in \emph{both} equations —
+it links $i_{12}$ and $\icm$ bidirectionally.
+
+\begin{warningbox}[The Coupling Term $\dfrac{k-1}{2kpC}$]
+\begin{itemize}
+    \item $k = 1$: coupling $= 0$.  Eqs.~\eqref{eq:DM_asym} and
+          \eqref{eq:CM_asym} reduce exactly to
+          Eqs.~\eqref{eq:DM_sym} and \eqref{eq:CM_sym}. \checkmark
+    \item $k < 1$ (real MCPM — source cap is smaller):
+          coupling is negative.  A positive DM oscillation drives
+          CM current in the opposite direction.
+    \item The coupling is \emph{purely capacitive} (the $1/p$ factor
+          means it behaves like a capacitor element in the circuit).
+          Changing $R$ or $L$ cannot remove it — only restoring
+          $k = 1$ sets the coupling to zero.
+\end{itemize}
+\end{warningbox}
+
+\begin{physbox}[The Big Picture]
+The transformation matrices $\TiN$ and $\TvN$ have now done their
+full job.  They converted the messy $N \times N$ mixed-mode
+equation into a structured set where:
+\begin{enumerate}
+    \item $R$ and $L$ contribute only diagonal terms (via $\mathbf{M}$)
+          — they never cause DM--CM coupling.
+    \item The capacitor matrix $\mathbf{S}_N$ is the sole source of
+          coupling, and only through the off-diagonal entries of
+          $\mathbf{S}_{\mathrm{DCM}}$.
+    \item The coupling magnitude is proportional to $(k-1)$:
+          the further the circuit deviates from symmetry, the stronger
+          the DM-to-CM noise injection.
+\end{enumerate}
+The next sections apply this framework to an actual SiC half-bridge
+power module, where specific values of $k$ and the parasitic
+capacitance $\Cp$ allow us to build a concrete CM equivalent circuit.
+\end{physbox}
 
 % \section{The Half-Bridge Testbed and the MCPM}
 % TODO: §3 — MCPM structure, Fig. 2 walk, LISN explanation,
