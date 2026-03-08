@@ -19,24 +19,47 @@ is a fixed, coordinate-free object.  A \emph{matrix} is only its
 same map is represented by a different matrix — but nothing physical
 has changed.
 
-Formally, if $A$ represents a linear map in the standard basis and
-$P$ is the change-of-basis matrix (columns = new basis vectors), then
+For a linear map $A \colon V \to V$ acting \emph{within a single
+vector space}, changing basis with matrix $P$ gives the
+\textbf{similarity transformation}:
 \[
-    A_{\mathrm{new}} = P^{-1} A P
+    A_{\mathrm{new}} = P^{-1} A P.
 \]
-represents the \emph{same} map in the new basis.
+The same $P$ appears on both sides because domain and codomain are
+the same space — they are transformed by the same matrix.
 
-The mixed-mode equation is exactly this:
+\textbf{The circuit case is different — and this is the key point.}
+The impedance matrix $\mathbf{Z}$ does not map a space to itself.
+It maps \emph{currents} to \emph{voltages} — two physically distinct
+spaces:
+\[
+    \mathbf{Z}
+    \colon \underbrace{\mathbb{R}^N}_{\text{current space}}
+    \;\longrightarrow\;
+    \underbrace{\mathbb{R}^N}_{\text{voltage space}}.
+\]
+For a map $A \colon V \to W$ between \emph{two different spaces},
+changing basis in the domain by $P$ and in the codomain by $Q$
+\emph{independently} gives the correct formula:
+\[
+    \boxed{A_{\mathrm{new}} = Q\,A\,P^{-1}.}
+\]
+Here $P = \TiN$ (new basis for current space) and
+$Q = \TvN$ (new basis for voltage space), so:
 \[
     \underbrace{\mathbf{Z}}_{\text{per-line basis}}\,\mathbf{i}
-    = \mathbf{v}_{nP} + v_{Pg}\,\mathbf{1}_N
-    \qquad\xrightarrow{\;\text{change basis}\;}\qquad
+    = \mathbf{v}_{nP}
+    \quad\xrightarrow{\;P=\TiN,\;Q=\TvN\;}\quad
     \underbrace{\mathbf{Z}_{\mathrm{DCM}}}_{\text{DM--CM basis}}\,\iDCM
-    = \vDCM + v_{Pg}\,\mathbf{e}_N.
+    = \vDCM,
+    \qquad
+    \mathbf{Z}_{\mathrm{DCM}} = \TvN\,\mathbf{Z}\,(\TiN)^{-1}.
 \]
-$\mathbf{Z}_{\mathrm{DCM}} = \TvN\,\mathbf{Z}\,(\TiN)^{-1}$ is the
-same impedance operator — the same physics — expressed in the DM--CM
-coordinate system.
+The similarity formula $P^{-1}AP$ is the special case $Q = P$ —
+i.e.\ when domain and codomain are the same space transformed by the
+\emph{same} matrix.  Here $Q \neq P$ because currents and voltages
+obey different physical laws, forcing different basis-change matrices.
+Why exactly $\TvN \neq \TiN$ is the subject of \S A.4.
 
 \begin{statebox}[Strang's Framing, Applied Here]
 ``The whole point of a basis change is to find a coordinate system
@@ -138,14 +161,13 @@ coordinate system, you can see it directly.
 % ---- A.4 ----
 \subsection{Why $\TvN \neq \TiN$ — KVL and KCL Are Different Operations}
 
-In Strang's abstract change-of-basis story, the \emph{same} matrix
-$P$ transforms both the vector $\mathbf{x}$ and the image
-$A\mathbf{x}$, giving $P^{-1}AP$.  So why does the circuit require
-two \emph{different} matrices — $\TiN$ for currents and $\TvN$ for
-voltages?
+Section~A.1 established that the correct formula for a linear map
+between two spaces is $A_{\mathrm{new}} = Q\,A\,P^{-1}$, not
+$P^{-1}AP$.  The remaining question is: \emph{why} does this circuit
+require $Q = \TvN \neq P = \TiN$?  The answer is physical.
 
-Because voltages and currents are governed by \emph{different physical
-laws} that produce different natural operations:
+Voltages and currents are governed by \emph{different physical laws}
+that produce different natural operations:
 
 \begin{itemize}
     \item \textbf{Currents obey KCL} (sum at a node).  CM current is
