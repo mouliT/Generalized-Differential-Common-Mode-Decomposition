@@ -1136,25 +1136,183 @@ asymmetry-induced conducted EMI.
 \subsection{The N-Line Circuit Equations}
 % ------------------------------------------------------------
 
-Refer back to the general model of \figref{fig:P1Fig1}.
-For line~$n$, KVL from the left input terminal through the series
-$R$--$L$ and the shunt capacitor to ground gives:
+The goal of this section is to write down the circuit equations in
+the original per-line variables before any DM--CM transformation.
+We build them up one component at a time — no matrices yet.
+
+% ---- single line ----
+\subsubsection*{Step 1 — Pick One Line and Label It}
+
+Look at \figref{fig:P1Fig1} and single out \emph{line~$n$}.
+It contains three circuit elements in the path from the left input
+terminal to ground:
+
+\begin{circuitbox}[Elements on Line $n$ (from left to right)]
+\begin{itemize}
+    \item \textbf{Series resistor $R$:} models wiring resistance,
+          bond-wire resistance, busbar loss.
+    \item \textbf{Series inductor $L$:} models trace or cable
+          inductance.
+    \item \textbf{Shunt capacitor $C_n$:} parasitic capacitance
+          from line~$n$ to the grounded baseplate.
+          Lines $1$ to $N-1$ have $C_n = C$;
+          line~$N$ has $C_N = kC$ (the asymmetric one).
+\end{itemize}
+Current $i_n$ flows left to right through $R$ and $L$, then
+down through $C_n$ to ground.
+\end{circuitbox}
+
+% ---- left terminal voltage ----
+\subsubsection*{Step 2 — What Is the Driving Voltage?}
+
+The left terminal of line~$n$ sits at voltage $v_{nP}$ with
+respect to the floating reference~$P$.
+But $P$ is not ground — it is at $v_{Pg}$ above ground
+(recall \S1.2).  So the voltage of line~$n$'s left terminal
+\emph{with respect to ground} is:
+\[
+    v_{n,\mathrm{gnd}}
+    = \underbrace{v_{nP}}_{\text{line to }P}
+    + \underbrace{v_{Pg}}_{P\text{ to ground}}
+    = v_{nP} + v_{Pg}.
+\]
+This is the total voltage that drives current through the series
+$R$--$L$--$C_n$ path to ground.
+
+% ---- three voltage drops ----
+\subsubsection*{Step 3 — Write the Voltage Drop Across Each Element}
+
+\textbf{Resistor} $R$: by Ohm's law the voltage drop is
+\[
+    v_R = R\, i_n.
+\]
+
+\textbf{Inductor} $L$: by Faraday's law the voltage drop is
+\[
+    v_L = L\,\frac{d\,i_n}{d\,t}.
+\]
+Shorthand: define the operator $p \triangleq d/dt$
+(called the \emph{Heaviside operator}).  Then
+$v_L = pL\cdot i_n$.  Every time you see $p$ in front of
+something, read it as ``multiply by $d/dt$''.
+
+\textbf{Capacitor} $C_n$: the capacitor accumulates charge
+$Q = \int i_n\,dt$.  Its terminal voltage is
+\[
+    v_{C_n} = \frac{Q}{C_n}
+            = \frac{1}{C_n}\int i_n\,dt
+            = \frac{i_n}{p\,C_n}.
+\]
+The last step uses $1/p \equiv \int dt$ (integration is the
+inverse of differentiation).
+
+% ---- KVL ----
+\subsubsection*{Step 4 — Apply KVL}
+
+The driving voltage equals the sum of the three drops:
 \[
     v_{nP} + v_{Pg}
-    = \Bigl(R + pL + \frac{S_n}{p}\Bigr)\,i_n,
-    \qquad S_n = \frac{1}{C_n},
+    = \underbrace{R\,i_n}_{v_R}
+    + \underbrace{pL\cdot i_n}_{v_L}
+    + \underbrace{\dfrac{i_n}{p\,C_n}}_{v_{C_n}}.
 \]
-where $p = d/dt$ is the Heaviside operator and $S_n$ is the
-\emph{elastance} (reciprocal capacitance) of line $n$'s shunt element.
+Factor out $i_n$:
 
-\begin{physbox}[Why Elastance?]
-Writing $S_n/p$ instead of $1/(pC_n)$ separates the circuit
-parameter ($S_n$) from the integrating operator ($1/p$), making
-the matrix algebra cleaner.  The elastance matrix $\mathbf{S}_N$
-collects all $N$ shunt-cap parameters into a single object.
+\begin{eqnbox}[Per-Line KVL — One Equation for Line $n$]
+\begin{equation}
+    v_{nP} + v_{Pg}
+    = \Bigl(R + pL + \frac{1}{p\,C_n}\Bigr)\,i_n
+    \label{eq:KVL_one}
+\end{equation}
+\end{eqnbox}
+
+This is the fundamental equation.  Everything that follows is just
+writing it $N$ times and packing it into a matrix.
+
+% ---- elastance ----
+\subsubsection*{Step 5 — Introduce Elastance $S_n = 1/C_n$}
+
+Define the \emph{elastance} of the shunt cap on line~$n$:
+\[
+    S_n \triangleq \frac{1}{C_n}.
+\]
+Then $\dfrac{1}{pC_n} = \dfrac{S_n}{p}$, and
+Eq.~\eqref{eq:KVL_one} becomes:
+\[
+    v_{nP} + v_{Pg}
+    = \Bigl(R + pL + \frac{S_n}{p}\Bigr)\,i_n.
+\]
+
+\begin{physbox}[Why Bother Naming $1/C_n$ as $S_n$?]
+In the per-line equation, $1/C_n$ always appears together with
+the operator $1/p$.  When we stack $N$ equations into a matrix
+(Step~6 below), the $1/p$ factor will appear \emph{outside} the
+matrix, while the capacitances appear \emph{inside} as matrix entries.
+Writing $S_n$ keeps the two roles cleanly separated:
+\[
+    \frac{S_n}{p}\cdot i_n
+    \;\longrightarrow\;
+    \frac{1}{p}\,\mathbf{S}_N\,\mathbf{i}.
+\]
+The matrix $\mathbf{S}_N$ holds the circuit parameters;
+$1/p$ is the integrating operator that sits in front.
 \end{physbox}
 
-Stacking $N$ such equations into column-vector form:
+The numerical values of the elastances in the $N$-line model are:
+\[
+    S_1 = S_2 = \cdots = S_{N-1} = \frac{1}{C},
+    \qquad
+    S_N = \frac{1}{kC}.
+\]
+
+% ---- N equations ----
+\subsubsection*{Step 6 — Write the Equation for Every Line}
+
+Applying Eq.~\eqref{eq:KVL_one} to each of the $N$ lines:
+\begin{align*}
+    v_{1P} + v_{Pg}
+        &= \Bigl(R + pL + \tfrac{1}{pC}\Bigr)\,i_1 \\[4pt]
+    v_{2P} + v_{Pg}
+        &= \Bigl(R + pL + \tfrac{1}{pC}\Bigr)\,i_2 \\[4pt]
+        &\;\vdots \\[4pt]
+    v_{(N-1)P} + v_{Pg}
+        &= \Bigl(R + pL + \tfrac{1}{pC}\Bigr)\,i_{N-1} \\[4pt]
+    v_{NP} + v_{Pg}
+        &= \Bigl(R + pL + \tfrac{1}{kpC}\Bigr)\,i_N
+\end{align*}
+
+Three things to notice:
+\begin{itemize}
+    \item $v_{Pg}$ appears in \textbf{every} equation — it is a
+          common additive term on the left of all $N$ lines.
+    \item The coefficient $(R + pL)$ is \textbf{identical} across
+          all $N$ lines.
+    \item The cap term differs \textbf{only on the last line}:
+          $1/(pC)$ for lines 1 to $N-1$, but $1/(kpC)$ for line $N$.
+\end{itemize}
+
+% ---- matrix stacking ----
+\subsubsection*{Step 7 — Stack into a Matrix Equation}
+
+Collect the $N$ unknowns and $N$ driving voltages into column
+vectors:
+\[
+    \mathbf{i} = \begin{bmatrix} i_1 \\ \vdots \\ i_N \end{bmatrix},
+    \qquad
+    \mathbf{v}_{nP} = \begin{bmatrix} v_{1P} \\ \vdots \\ v_{NP} \end{bmatrix},
+    \qquad
+    \mathbf{1}_N = \begin{bmatrix} 1 \\ \vdots \\ 1 \end{bmatrix}.
+\]
+
+The shared term $v_{Pg}$ multiplies the all-ones vector
+$\mathbf{1}_N$, because it appears on the left of \emph{every}
+equation.  The right-hand side has a coefficient matrix
+$\mathbf{Z}$ that encodes both the $R$--$L$ and the cap
+contributions.  Since $(R + pL)$ is the same on every line, it
+contributes $(R + pL)\,\mathbf{I}_N$ (scalar times identity).
+The cap terms differ line by line, so they contribute
+$(1/p)\,\mathbf{S}_N$ where $\mathbf{S}_N$ is a diagonal matrix
+of elastances.  Putting it all together:
 
 \begin{eqnbox}[Mixed-Mode Circuit Equations — Eq.~9 in paper]
 \begin{equation}
@@ -1162,7 +1320,7 @@ Stacking $N$ such equations into column-vector form:
     = \mathbf{v}_{nP} + v_{Pg}\,\mathbf{1}_N
     \label{eq:MMeqn}
 \end{equation}
-where the impedance operator matrix and the elastance matrix are
+where
 \[
     \mathbf{Z}
     = (R + pL)\,\mathbf{I}_N + \frac{1}{p}\,\mathbf{S}_N,
@@ -1171,22 +1329,25 @@ where the impedance operator matrix and the elastance matrix are
     = \operatorname{diag}\!\Bigl(
         \underbrace{\tfrac{1}{C},\;\ldots,\;\tfrac{1}{C}}_{N-1},\;
         \tfrac{1}{kC}
-      \Bigr),
+      \Bigr).
 \]
-and $\mathbf{1}_N = [1,\ldots,1]^T$,\;
-$\mathbf{i} = [i_1,\ldots,i_N]^T$,\;
-$\mathbf{v}_{nP} = [v_{1P},\ldots,v_{NP}]^T$.
 \end{eqnbox}
+
+This is just $N$ copies of Eq.~\eqref{eq:KVL_one} written
+at once.  No new physics — only compact notation.
 
 \begin{statebox}[Two Observations About $\mathbf{Z}$]
 \begin{itemize}
-    \item $(R + pL)\,\mathbf{I}_N$ — every line has the same $R$
-          and $L$, so this is a scalar multiple of the identity.
-          It will transform cleanly.
-    \item $\mathbf{S}_N$ — diagonal, but \emph{not} proportional
-          to the identity when $k \neq 1$.  This is the \textbf{only}
-          asymmetric object in the equation and the only source of
-          DM--CM coupling after transformation.
+    \item \textbf{$(R + pL)\,\mathbf{I}_N$ is a scaled identity.}
+          Every line has the same $R$ and $L$, so this block is
+          perfectly symmetric.  It will transform very cleanly in
+          the next section.
+    \item \textbf{$\mathbf{S}_N$ is diagonal but not symmetric}
+          when $k \neq 1$.  All entries equal $1/C$ except the
+          last, which is $1/(kC)$.  This is the \textbf{only}
+          source of asymmetry in the entire equation — and
+          therefore the only possible source of DM--CM coupling
+          after the transformation.
 \end{itemize}
 \end{statebox}
 
