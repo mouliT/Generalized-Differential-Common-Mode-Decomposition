@@ -1636,6 +1636,255 @@ ratio $k$ changed.  The CM current jumps from zero to 1.57\,mA.
 This is the numerical proof of the opening paragraph's claim.
 \end{statebox}
 
+% ---- N = 3 extension ----
+\subsubsection*{Extension to $N = 3$ Lines}
+
+The $N = 2$ proof captures the core result.  Extending to $N = 3$
+reveals an additional effect that $N = 2$ cannot show: when one
+capacitor is $kC$, asymmetry couples not only DM to CM, but also
+the two DM pairs \emph{to each other}.
+
+\subsubsection*{Step 1 — The $N = 3$ DCM Elastance Matrix}
+
+With $\mathbf{S}_3 = \operatorname{diag}(1/C,\;1/C,\;1/(kC))$
+(lines 1 and 2 symmetric, line 3 asymmetric at capacitance $kC$)
+and the $N = 3$ matrices from \S1.5, the same two-stage computation
+of \S2.2 gives:
+
+\begin{eqnbox}[DCM Elastance Matrix ($N = 3$, general $k$)]
+\begin{equation}
+\mathbf{S}_{\mathrm{DCM}}^{(3)}
+= \frac{1}{C}
+\begin{bmatrix}
+    2 & 0 & 0 \\[8pt]
+    \dfrac{2(1-k)}{3k} & \dfrac{2(k+2)}{3k} & \dfrac{k-1}{3k} \\[12pt]
+    \dfrac{2(k-1)}{9k} & \dfrac{4(k-1)}{9k} & \dfrac{2k+1}{9k}
+\end{bmatrix}
+\label{eq:Sdcm_N3}
+\end{equation}
+All off-diagonal entries are zero if and only if $k = 1$.
+\end{eqnbox}
+
+\begin{statebox}[Structural Observation: Row 1 is Always $k$-Independent]
+Row 1 is $[2/C,\;0,\;0]$ for \emph{any} $k$.  Lines 1 and 2 both
+have cap $C$, so the DM(1--2) equation never involves $kC$.
+Coupling enters only in rows 2 and 3 — DM pair (2--3) and CM —
+because both involve line 3.
+\end{statebox}
+
+\subsubsection*{Step 2 — The Phasor System}
+
+With $R = L = 0$ and $p \to j\omega$, under pure DM(1--2) excitation
+($V_{12} = 1\,\text{V}$, $V_{23} = V_{\mathrm{CM}} = V_{Pg} = 0$):
+
+\begin{eqnbox}[$N = 3$ Phasor System Under DM(1--2) Excitation Only]
+\begin{equation}
+\frac{1}{j\omega C}
+\begin{bmatrix}
+    2 & 0 & 0 \\[8pt]
+    \dfrac{2(1-k)}{3k} & \dfrac{2(k+2)}{3k} & \dfrac{k-1}{3k} \\[12pt]
+    \dfrac{2(k-1)}{9k} & \dfrac{4(k-1)}{9k} & \dfrac{2k+1}{9k}
+\end{bmatrix}
+\begin{bmatrix} I_{12} \\[4pt] I_{23} \\[4pt] I_{\mathrm{CM}} \end{bmatrix}
+=
+\begin{bmatrix} 1\,\mathrm{V} \\[4pt] 0 \\[4pt] 0 \end{bmatrix}
+\label{eq:num_sys_N3}
+\end{equation}
+\end{eqnbox}
+
+\subsubsection*{Case A — Symmetric ($k = 1$): three independent equations}
+
+At $k = 1$ every off-diagonal entry vanishes.  The matrix becomes
+diagonal and the three rows decouple:
+\[
+\frac{1}{j\omega C}
+\begin{bmatrix} 2 & 0 & 0 \\ 0 & 2 & 0 \\ 0 & 0 & \tfrac{1}{3} \end{bmatrix}
+\begin{bmatrix} I_{12} \\ I_{23} \\ I_{\mathrm{CM}} \end{bmatrix}
+=
+\begin{bmatrix} 1\,\mathrm{V} \\ 0 \\ 0 \end{bmatrix}.
+\]
+Each row gives one unknown immediately:
+\[
+    I_{12} = \frac{j\omega C}{2}, \qquad I_{23} = 0, \qquad
+    \boxed{I_{\mathrm{CM}} = 0.}
+\]
+Only the directly excited DM(1--2) current is non-zero.  DM(2--3)
+and CM are completely silent — modes are decoupled.
+
+\begin{statebox}[Diagonal Entries at $k = 1$: Circuit Check]
+\begin{itemize}
+    \item $S_{11} = 2/C$: DM(1--2) cap impedance.
+          Lines 1 and 2 each have cap $C$; their DM current sees
+          them in series $\Rightarrow$ $C/2$, elastance $= 2/C$. \checkmark
+    \item $S_{22} = 2/C$: DM(2--3) cap impedance.
+          At $k = 1$ lines 2 and 3 also have cap $C$; same
+          series result. \checkmark
+    \item $S_{33} = 1/(3C)$: CM cap impedance.
+          Three caps $C$ in parallel $\Rightarrow$ $3C$,
+          elastance $= 1/(3C)$. \checkmark
+\end{itemize}
+\end{statebox}
+
+\subsubsection*{Case B — Asymmetric ($k = 0.5$): coupling across all
+three equations}
+
+Substitute $k = 0.5$ into Eq.~\eqref{eq:Sdcm_N3}:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{lcc}
+\toprule
+Entry & Formula & Value at $k = 0.5$ \\
+\midrule
+$S_{21}$ (DM23 driven by DM12) & $2(1-k)/(3k)$  & $2/3$  \\
+$S_{22}$ (DM23 self)           & $2(k+2)/(3k)$  & $10/3$ \\
+$S_{23}$ (DM23 driven by CM)   & $(k-1)/(3k)$   & $-1/3$ \\
+$S_{31}$ (CM driven by DM12)   & $2(k-1)/(9k)$  & $-2/9$ \\
+$S_{32}$ (CM driven by DM23)   & $4(k-1)/(9k)$  & $-4/9$ \\
+$S_{33}$ (CM self)             & $(2k+1)/(9k)$  & $4/9$  \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The system (Eq.~\ref{eq:num_sys_N3}) becomes:
+\[
+\frac{1}{j\omega C}
+\begin{bmatrix}
+    2 & 0 & 0 \\
+    \tfrac{2}{3} & \tfrac{10}{3} & -\tfrac{1}{3} \\
+    -\tfrac{2}{9} & -\tfrac{4}{9} & \tfrac{4}{9}
+\end{bmatrix}
+\begin{bmatrix} I_{12} \\ I_{23} \\ I_{\mathrm{CM}} \end{bmatrix}
+=
+\begin{bmatrix} 1\,\mathrm{V} \\ 0 \\ 0 \end{bmatrix}.
+\]
+
+\textbf{Step 1 — Row 1} (same structure as $k = 1$, since row 1 is
+$k$-independent):
+\[
+    I_{12} = \frac{j\omega C}{2}.
+\]
+
+\textbf{Step 2 — substitute $I_{12}$ into Rows 2 and 3}
+(multiply each row by $j\omega C$):
+
+Row~2: $\;\tfrac{2}{3}\cdot\tfrac{j\omega C}{2}
+        + \tfrac{10}{3}\,I_{23}
+        - \tfrac{1}{3}\,I_{\mathrm{CM}} = 0$
+\quad$\Rightarrow$\quad multiply by 3:
+\[
+    j\omega C + 10\,I_{23} - I_{\mathrm{CM}} = 0. \hspace{1.5cm}\text{(A)}
+\]
+
+Row~3: $\;-\tfrac{2}{9}\cdot\tfrac{j\omega C}{2}
+          - \tfrac{4}{9}\,I_{23}
+          + \tfrac{4}{9}\,I_{\mathrm{CM}} = 0$
+\quad$\Rightarrow$\quad multiply by 9:
+\[
+    -j\omega C - 4\,I_{23} + 4\,I_{\mathrm{CM}} = 0. \hspace{1.5cm}\text{(B)}
+\]
+
+\textbf{Step 3 — solve (A) and (B) simultaneously:}
+
+From (B): $I_{\mathrm{CM}} = (j\omega C + 4\,I_{23})/4$.
+Substitute into (A):
+\[
+    j\omega C + 10\,I_{23} - \frac{j\omega C + 4\,I_{23}}{4} = 0
+    \;\;\Rightarrow\;\;
+    \frac{3\,j\omega C}{4} + 9\,I_{23} = 0
+    \;\;\Rightarrow\;\;
+    I_{23} = -\frac{j\omega C}{12}.
+\]
+\[
+    I_{\mathrm{CM}}
+    = \frac{j\omega C + 4(-j\omega C/12)}{4}
+    = \frac{j\omega C\,(1 - 1/3)}{4}
+    = \frac{j\omega C}{6}.
+\]
+
+\begin{eqnbox}[Final Results ($N = 3$, $k = 0.5$, $V_{12} = 1\,\text{V}$,
+              $V_{23} = V_{\mathrm{CM}} = 0$)]
+\[
+    I_{12} = \frac{j\omega C}{2},
+    \qquad
+    I_{23} = -\frac{j\omega C}{12},
+    \qquad
+    I_{\mathrm{CM}} = \frac{j\omega C}{6}.
+\]
+At $C = 1\,\text{nF}$, $f = 1\,\text{MHz}$:\quad
+$|I_{12}| \approx 3.14\,\text{mA}$,\;
+$|I_{23}| \approx 0.52\,\text{mA}$,\;
+$|I_{\mathrm{CM}}| \approx 1.05\,\text{mA}$.
+\end{eqnbox}
+
+\begin{physbox}[Physical Check: Why $I_{\mathrm{CM}} \neq 0$ for $k = 0.5$]
+The excitation $V_{12} = 1\,\text{V}$, $V_{23} = V_{\mathrm{CM}} = 0$
+forces the three line voltages to:
+\[
+    v_{1P} = +\tfrac{2}{3}\,\text{V},\qquad
+    v_{2P} = -\tfrac{1}{3}\,\text{V},\qquad
+    v_{3P} = -\tfrac{1}{3}\,\text{V}.
+\]
+With $v_{Pg} = 0$ the capacitor currents to ground are:
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{cccc}
+\toprule
+Line & Cap & Voltage & Cap current (units of $j\omega C$) \\
+\midrule
+1 & $C$   & $+2/3\,\text{V}$ & $+2/3$ \\
+2 & $C$   & $-1/3\,\text{V}$ & $-1/3$ \\
+3 & $kC$  & $-1/3\,\text{V}$ & $-k/3$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+Total ground current $= j\omega C\!\left(\tfrac{2}{3} - \tfrac{1}{3}
+- \tfrac{k}{3}\right) = j\omega C\cdot\dfrac{1-k}{3}$.
+\begin{itemize}
+    \item $k = 1$: ground current $= 0$.  Perfect cancellation. \checkmark
+    \item $k = 0.5$: ground current $= j\omega C/6$.
+          Matches $I_{\mathrm{CM}} = j\omega C/6$. \checkmark
+\end{itemize}
+Cap 3 draws less current than it would if $k = 1$.  The
+``shortfall'' escapes as $I_{\mathrm{CM}}$ — the conducted EMI
+current a LISN would measure.
+\end{physbox}
+
+\begin{statebox}[Summary: $k = 1$ vs.\ $k = 0.5$ for $N = 3$]
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Current}
+    & $k = 1$ (symmetric)
+    & $k = 0.5$ (asymmetric) \\
+\midrule
+$I_{12}$ (DM pair 1--2)
+    & $j\omega C/2$
+    & $j\omega C/2$ \emph{(unchanged)} \\
+$I_{23}$ (DM pair 2--3)
+    & $0$
+    & $-j\omega C/12$ \emph{(appeared!)} \\
+$I_{\mathrm{CM}}$
+    & $0$
+    & $j\omega C/6$ \emph{(appeared!)} \\
+$|I_{\mathrm{CM}}|$ at $C=1\,\text{nF}$, $1\,\text{MHz}$
+    & $0\,\text{mA}$
+    & $1.05\,\text{mA}$ \\
+Modes coupled?
+    & \textbf{No}
+    & \textbf{Yes} \\
+\bottomrule
+\end{tabular}
+\end{center}
+\textbf{New insight beyond $N = 2$:} asymmetry on a single line
+couples not just DM to CM, but also the two DM pairs to each other.
+$I_{23} \neq 0$ even though $V_{23} = 0$ — the DM(1--2) oscillation,
+filtered through the cap mismatch, induces a DM(2--3) current as a
+side effect.  DM pair (1--2) itself is oblivious (its equation is
+$k$-independent), yet it excites the rest of the system.
+\end{statebox}
+
 \begin{physbox}[The Big Picture]
 The transformation matrices $\TiN$ and $\TvN$ have now done their
 full job.  They converted the messy $N \times N$ mixed-mode
