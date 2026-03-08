@@ -1179,6 +1179,33 @@ But $P$ is not ground — it is at $v_{Pg}$ above ground
 This is the total voltage that drives current through the series
 $R$--$L$--$C_n$ path to ground.
 
+% ---- EMI approximation ----
+\begin{physbox}[EMI-Frequency Approximation: Why $i_n$ Flows Entirely Through $C_n$]
+Look carefully at Fig.~\ref{fig:P1Fig1}.  In general, line $n$ carries
+\emph{two} currents: $i_n$ entering from the left, and $i_n'$ leaving
+to the right toward the load.  By KCL at the junction above $C_n$:
+\[
+    i_{C_n} = i_n - i_n'.
+\]
+The \emph{exact} capacitor voltage drop is therefore
+$v_{C_n} = (i_n - i_n')/(p\,C_n)$, \emph{not} simply $i_n/(p\,C_n)$.
+
+\textbf{Why can we use $i_n$ alone?}  At EMI frequencies (tens of kHz
+and above), the shunt capacitor $C_n$ looks like a near-short circuit:
+\[
+    \frac{1}{\omega C_n} \ll Z_{\mathrm{load}}.
+\]
+The high-frequency current strongly prefers the low-impedance
+cap-to-ground path over the load path.  As a result,
+\[
+    i_n' \approx 0
+    \quad\Longrightarrow\quad
+    i_{C_n} \approx i_n.
+\]
+\textbf{Every voltage drop written in Step 3, and every equation that
+follows, uses this approximation.}
+\end{physbox}
+
 % ---- three voltage drops ----
 \subsubsection*{Step 3 — Write the Voltage Drop Across Each Element}
 
@@ -1268,40 +1295,7 @@ The numerical values of the elastances in the $N$-line model are:
 % ---- N equations ----
 \subsubsection*{Step 6 — Write the Equation for Every Line}
 
-\begin{physbox}[EMI-Frequency Approximation: $i_n' \approx 0$]
-Look again at Fig.~\ref{fig:fig1}.  Each line has \emph{two} currents:
-$i_n$ flowing from the source through $R$, $L$, and $C_n$, and
-$i_n'$ flowing into the load.  By KCL at the top plate of $C_n$:
-\[
-    i_{C_n} = i_n - i_n'.
-\]
-The \emph{exact} KVL for line $n$ is therefore
-\begin{equation}
-    v_{nP} + v_{Pg}
-    = (R + pL)\,i_n + \frac{S_n}{p}(i_n - i_n').
-    \label{eq:KVL_exact}
-\end{equation}
-
-At \textbf{EMI frequencies} (tens of kHz and above), the parasitic
-capacitor $C_n$ is a near-short circuit:
-\[
-    \frac{1}{\omega C_n} \ll Z_{\mathrm{load}}.
-\]
-Almost all high-frequency current takes the low-impedance cap-to-ground
-path, leaving negligible current for the load:
-\[
-    i_n' \approx 0 \quad \Longrightarrow \quad i_{C_n} \approx i_n.
-\]
-Substituting into Eq.~\eqref{eq:KVL_exact} recovers the compact form
-\[
-    v_{nP} + v_{Pg}
-    = \Bigl(R + pL + \tfrac{S_n}{p}\Bigr)\,i_n,
-\]
-which is the equation the paper uses throughout.  \textbf{Every
-equation that follows assumes this approximation.}
-\end{physbox}
-
-Applying this approximation to each of the $N$ lines:
+Applying Eq.~\eqref{eq:KVL_one} to each of the $N$ lines:
 \begin{align*}
     v_{1P} + v_{Pg}
         &= \Bigl(R + pL + \tfrac{1}{pC}\Bigr)\,i_1 \\[4pt]
