@@ -1389,6 +1389,28 @@ applies the transformation to separate them.
 \subsection{Applying the DM--CM Transformation}
 % ------------------------------------------------------------
 
+\begin{physbox}[Why Transform? — The Motivation]
+The mixed-mode equation~\eqref{eq:MMeqn} is correct, but it is written
+in \emph{per-line} variables $(i_1, \ldots, i_N)$ and
+$(v_{1P}, \ldots, v_{NP})$.  Nobody in EMC measures per-line currents
+directly — a conducted-emissions test measures CM current, and a
+switching converter generates DM voltage.  The question we actually
+want to answer is: \emph{``a DM voltage drives the circuit; how much
+CM current results?''}  That answer is buried and unreadable in the
+per-line form.
+
+The fix is a \textbf{change of coordinates}: replace the per-line
+variables with the DM and CM variables defined in \S1.  The
+transformation matrices $\TiN$ and $\TvN$ are not new objects — they
+are exactly the DM/CM definitions from \S1 written as matrices.
+Applying them to both sides of Eq.~\eqref{eq:MMeqn} is the
+\emph{same physics}, re-expressed in a language where DM and CM are
+explicit.  The payoff: if the circuit is symmetric the resulting
+impedance matrix $\mathbf{Z}_\mathrm{DCM}$ is diagonal (no coupling);
+if it is asymmetric, off-diagonal entries appear — and those
+\emph{are} the DM--CM coupling, now directly readable.
+\end{physbox}
+
 Multiply Eq.~\eqref{eq:MMeqn} on the left by $\TvN$, then
 substitute $\mathbf{i} = (\TiN)^{-1}\iDCM$:
 \[
