@@ -1,0 +1,200 @@
+% ============================================================
+\appendix
+\section{The DM--CM Transformation Through the Lens of Linear Algebra}
+\label{app:linalg}
+% ============================================================
+
+The transformation in \S2.2 can feel like a clever algebraic trick
+specific to EMC.  It is not.  It is a direct application of
+\emph{change of basis} — one of the central ideas in Gilbert Strang's
+\textit{Introduction to Linear Algebra}.  This appendix unpacks the
+four deepest connections.
+
+% ---- A.1 ----
+\subsection{The Same Circuit in New Coordinates — Strang Chapter~8}
+
+Strang's core message on linear transformations is this: a linear map
+is a fixed, coordinate-free object.  A \emph{matrix} is only its
+\emph{representation} in a chosen basis.  Change the basis, and the
+same map is represented by a different matrix — but nothing physical
+has changed.
+
+Formally, if $A$ represents a linear map in the standard basis and
+$P$ is the change-of-basis matrix (columns = new basis vectors), then
+\[
+    A_{\mathrm{new}} = P^{-1} A P
+\]
+represents the \emph{same} map in the new basis.
+
+The mixed-mode equation is exactly this:
+\[
+    \underbrace{\mathbf{Z}}_{\text{per-line basis}}\,\mathbf{i}
+    = \mathbf{v}_{nP} + v_{Pg}\,\mathbf{1}_N
+    \qquad\xrightarrow{\;\text{change basis}\;}\qquad
+    \underbrace{\mathbf{Z}_{\mathrm{DCM}}}_{\text{DM--CM basis}}\,\iDCM
+    = \vDCM + v_{Pg}\,\mathbf{e}_N.
+\]
+$\mathbf{Z}_{\mathrm{DCM}} = \TvN\,\mathbf{Z}\,(\TiN)^{-1}$ is the
+same impedance operator — the same physics — expressed in the DM--CM
+coordinate system.
+
+\begin{statebox}[Strang's Framing, Applied Here]
+``The whole point of a basis change is to find a coordinate system
+in which the problem looks simpler.''\\[4pt]
+Here, \emph{simpler} means: DM and CM appear as explicit, separate
+rows in the equation — so the question ``does DM voltage drive CM
+current?'' is answered by reading a single matrix entry, not by
+solving $N$ equations and post-processing.
+\end{statebox}
+
+% ---- A.2 ----
+\subsection{How Does Anyone Invent These Matrices? — The Basis Comes From the Problem}
+
+The most common reaction to seeing $\TiN$ and $\TvN$ for the first
+time is: \emph{how did the author know to use these?}
+
+Strang answers the analogous question about eigenvectors by saying:
+the right basis for a problem is not invented algebraically — it
+emerges from the \emph{structure of the problem itself}.  For
+eigenproblems, the structure is the matrix $A$.  For DM--CM
+decomposition, the structure is \emph{what your instruments measure}.
+
+\begin{physbox}[The Matrices Write Themselves From Measurement Rules]
+\begin{itemize}
+    \item A \textbf{clamp meter} looped around all $N$ wires reads
+          $i_1 + i_2 + \cdots + i_N$.  That IS the bottom row of
+          $\TiN$: $\;[\,1,\;1,\;\ldots,\;1\,]$.
+
+    \item A \textbf{differential current probe} on lines $m$ and $n$
+          reads $\tfrac{1}{2}(i_m - i_n)$.  That IS the corresponding
+          DM row of $\TiN$: $\;[\,\ldots,\;\tfrac{1}{2},\;\ldots,\;
+          {-\tfrac{1}{2}},\;\ldots\,]$.
+\end{itemize}
+Write down every measurement rule as a row.  Stack the rows.  You
+have $\TiN$.  The matrix was never invented — it was \emph{read off
+from the measurement setup}.
+\end{physbox}
+
+There is also a deeper algebraic reason the DM--CM directions are
+natural.  Define the CM vector $\mathbf{c} = [1, 1, \ldots, 1]^T$.
+\begin{itemize}
+    \item The \textbf{CM subspace} is $\operatorname{span}\{\mathbf{c}\}$
+          — all lines oscillate together, in the same direction.
+    \item The \textbf{DM subspace} is the null space of $\mathbf{c}^T$
+          — vectors whose entries sum to zero (pure differences, no
+          common component).
+\end{itemize}
+By Strang's Fundamental Theorem of Linear Algebra (Chapter~3), the
+row space and null space of any matrix are orthogonal complements.
+Here: the CM subspace ($1$-dimensional) and the DM subspace
+($(N{-}1)$-dimensional) are orthogonal complements in $\mathbb{R}^N$
+and together span all of $\mathbb{R}^N$.  Every per-line current
+vector splits \emph{uniquely} into a CM part and a DM part — this
+uniqueness is what makes the transformation invertible (recall \S1.6).
+
+% ---- A.3 ----
+\subsection{Diagonalization, Coupling, and Eigenvectors — Strang Chapter~6}
+
+Strang's diagonalization theorem: a matrix $A$ is diagonal in basis
+$P$ — i.e.\ $P^{-1}AP = \Lambda$ — \emph{if and only if} the
+columns of $P$ are eigenvectors of $A$.
+
+Now apply this directly to the two cases of this paper.
+
+\textbf{Symmetric circuit ($k = 1$).}\;
+$\mathbf{S}_N = \tfrac{1}{C}\mathbf{I}_N$, so
+$\mathbf{Z} = \bigl(R + pL + \tfrac{1}{pC}\bigr)\mathbf{I}_N
+             = \lambda\,\mathbf{I}_N$.
+A scalar multiple of the identity has \emph{every} vector as an
+eigenvector.  In particular, the DM--CM basis vectors are
+eigenvectors of $\mathbf{Z}$.  Therefore $\mathbf{Z}_{\mathrm{DCM}}$
+is diagonal: the DM and CM equations are fully decoupled.
+
+\textbf{Asymmetric circuit ($k \neq 1$).}\;
+$\mathbf{S}_N = \operatorname{diag}(1/C, \ldots, 1/C, 1/(kC))$,
+which is \emph{not} proportional to $\mathbf{I}_N$.  The DM--CM
+basis vectors are \textbf{not} eigenvectors of $\mathbf{Z}$.
+Therefore $\mathbf{Z}_{\mathrm{DCM}}$ is not diagonal — off-diagonal
+entries appear.
+
+\begin{eqnbox}[Strang's Lesson, Inverted]
+Strang uses diagonalization to \emph{simplify} a matrix by finding
+its eigenvector basis.  Here we do the opposite: we deliberately
+\textbf{choose a non-eigenvector basis} (DM--CM) because that is what
+EMC instruments measure.\\[4pt]
+The off-diagonal entries of $\mathbf{Z}_{\mathrm{DCM}}$ are not a
+failure to diagonalize — they are the \textbf{coupling we came to
+find}, made explicitly readable by the change of coordinates.  A DM
+voltage source produces CM current if and only if these off-diagonal
+entries are non-zero.
+\end{eqnbox}
+
+This also tells you immediately \emph{where} the coupling lives: only
+in the rows and columns that involve line $N$ (the asymmetric line),
+because that is the only entry of $\mathbf{S}_N$ that differs from
+the rest.  The algebra does not hide this — once you are in the right
+coordinate system, you can see it directly.
+
+% ---- A.4 ----
+\subsection{Why $\TvN \neq \TiN$ — KVL and KCL Are Different Operations}
+
+In Strang's abstract change-of-basis story, the \emph{same} matrix
+$P$ transforms both the vector $\mathbf{x}$ and the image
+$A\mathbf{x}$, giving $P^{-1}AP$.  So why does the circuit require
+two \emph{different} matrices — $\TiN$ for currents and $\TvN$ for
+voltages?
+
+Because voltages and currents are governed by \emph{different physical
+laws} that produce different natural operations:
+
+\begin{itemize}
+    \item \textbf{Currents obey KCL} (sum at a node).  CM current is
+          therefore a \emph{sum}: $\icm = i_1 + \cdots + i_N$.
+          DM current is a \emph{difference}: $i_{mn} =
+          \tfrac{1}{2}(i_m - i_n)$.
+
+    \item \textbf{Voltages obey KVL} (sum around a loop).  CM voltage
+          is an \emph{average}: $\vcm = \tfrac{1}{N}\sum v_{nP}$.
+          DM voltage is a \emph{full line-to-line difference}:
+          $\vdm{m}{n} = v_{mP} - v_{nP}$.
+\end{itemize}
+
+Notice the asymmetry: DM current carries a factor of $\tfrac{1}{2}$
+but DM voltage does not.  This is why $\TvN \neq \TiN$.  The factor
+choices are fixed by two requirements: (1) the definitions must match
+what instruments physically measure, and (2) the transformation must
+be invertible so that $i_n$ and $v_{nP}$ can be recovered from
+$\iDCM$ and $\vDCM$ (as shown in \S1.6).
+
+Strang discusses adjoint operators and dual spaces (Chapter~6) and
+shows that when you change coordinates for one quantity in a bilinear
+pairing, the other quantity transforms by the \emph{transpose-inverse}
+to preserve the pairing.  For $N = 2$ lines, this adjoint
+relationship holds exactly: $\TvN[2] = (\TiN[2])^{-T}$, and the
+DM--CM power identity $v_{12}\,I_{12} + \vcm\,\icm =
+v_{1P}\,i_1 + v_{2P}\,i_2$ is satisfied.  For $N > 2$ the
+definitions are fixed by measurement convention, and the clean
+adjoint relationship does not extend — a subtlety the paper does not
+need to resolve because it works entirely at the level of the
+transformed impedance matrix $\mathbf{Z}_{\mathrm{DCM}}$.
+
+\begin{statebox}[Four Strang Connections — Summary]
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{@{}lll@{}}
+    \textbf{\#} & \textbf{Strang concept} & \textbf{Role here} \\
+    \hline
+    A.1 & Change of basis (Ch.~8) &
+          $\mathbf{Z}_{\mathrm{DCM}} = \TvN\,\mathbf{Z}\,(\TiN)^{-1}$
+          is same circuit, new coordinates \\
+    A.2 & Right basis from problem structure (Ch.~3, 6) &
+          Rows of $\TiN$, $\TvN$ are instrument measurement rules \\
+    A.2 & Fundamental Theorem — null space $\perp$ row space (Ch.~3) &
+          DM subspace $\perp$ CM subspace; decomposition is unique \\
+    A.3 & Diagonalization (Ch.~6) &
+          Symmetric $\Rightarrow$ diagonal $\mathbf{Z}_{\mathrm{DCM}}$;
+          asymmetric $\Rightarrow$ off-diagonal = coupling \\
+    A.4 & Adjoint / dual spaces (Ch.~6) &
+          KVL $\neq$ KCL $\Rightarrow$ $\TvN \neq \TiN$ \\
+\end{tabular}
+\end{statebox}
+

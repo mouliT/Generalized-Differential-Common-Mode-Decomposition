@@ -1,0 +1,248 @@
+% ============================================================
+\setcounter{section}{-1}
+\section{Before You Begin}
+% ============================================================
+
+\subsection{What This Document Is}
+
+Modern power electronics cannot be designed without thinking about
+electromagnetic interference (EMI).  Every switch transition excites
+unintended current paths through the parasitic capacitances of the
+hardware, producing noise that must be suppressed to meet regulatory
+limits and to protect sensitive equipment.
+
+This tutorial takes the paper by Aaron D.\ Brovont (IEEE Transactions
+on Power Electronics, August 2018) and rebuilds its logic step by
+step — starting from things you already know (KVL, capacitor current,
+matrix multiplication) and arriving at a systematic mathematical tool
+that can predict exactly how much common-mode (CM) noise a switching
+converter will produce through a parasitic baseplate capacitance.
+
+The paper's main deliverable is a pair of \emph{transformation
+matrices} that decompose any mixed-mode (MM) circuit — one where
+differential-mode (DM) and CM signals are entangled — into cleanly
+separated DM and CM equations.  When the circuit is asymmetric, these
+equations also expose the exact \emph{coupling} between the two modes.
+As a worked example, the transformation is used to build two different
+(but equivalent) common-mode equivalent models for a SiC half-bridge
+converter whose parasitic module capacitances are unbalanced.
+
+By the end of this document you should be able to:
+\begin{itemize}
+    \item State precisely what CM and DM current and voltage mean
+          mathematically.
+    \item Apply the transformation matrices to a set of MM equations
+          and read off the DM-to-CM coupling terms introduced by
+          circuit asymmetry.
+    \item Identify every element of the two CEMs in the paper and
+          explain what physical mechanism each represents.
+    \item Explain why the two models give identical CM currents but
+          different physical pictures of the same testbed.
+\end{itemize}
+
+% ------------------------------------------------------------
+\subsection{Why Switching Converters Produce EMI}
+% ------------------------------------------------------------
+
+A SiC MOSFET in a 600\,V bus can switch its drain voltage from
+600\,V to 0\,V in under 100\,ns.  The rate of change is
+\[
+    \frac{dv}{dt} = \frac{600\,\text{V}}{100\,\text{ns}}
+                  = 6 \times 10^{9}\,\text{V/s}
+                  = 6\,\text{kV/}\mu\text{s}.
+\]
+Any capacitance $C$ connected between that switching node and the
+ground reference must carry a current $i = C\,dv/dt$.  Even a
+capacitance of 100\,pF — the approximate order of magnitude of a
+parasitic transistor-to-baseplate capacitance in a power module —
+will carry
+\[
+    i = 100 \times 10^{-12}\,\text{F}
+        \times 6 \times 10^{9}\,\text{V/s}
+      = 0.6\,\text{A}.
+\]
+
+\begin{physbox}[Why 0.6\,A Is a Problem]
+This 0.6\,A is not clean sinusoidal current at the fundamental
+frequency.  It is a pulse that repeats every switching period and
+therefore contains harmonics at 100\,kHz, 200\,kHz, 300\,kHz, and
+so on.  Regulatory conducted-emission standards (CISPR~11 for
+industrial equipment) set limits as low as $-50$\,dB$\mu$A
+($\approx 3\,\mu$A) at frequencies above 150\,kHz.  Three orders
+of magnitude of suppression are required.  Knowing \emph{where} the
+current flows is the first step to suppressing it.
+\end{physbox}
+
+This current does not flow through the intentional power path.
+Instead it escapes through parasitic capacitances to the chassis, the
+protective-earth wire, and the cable screen, returning through
+whatever ground path is available.  This escaping current is the
+\emph{common-mode conducted emission}.
+
+% ------------------------------------------------------------
+\subsection{Two Flavours of Noise: Differential Mode and Common Mode}
+% ------------------------------------------------------------
+
+Consider the simplest case: a two-wire power connection
+(positive conductor and negative/return conductor) carrying current
+to a load.
+
+\begin{circuitbox}[DM and CM in a Two-Wire System]
+\begin{itemize}
+    \item \textbf{Differential-mode (DM) current} flows in
+          \emph{opposite} directions on the two wires:
+          $i_1 = -i_2$.  This is the intentional power-carrying
+          current.  If you clip a current clamp around both wires
+          together, DM currents cancel and the reading is zero.
+          DM current is confined to the two-wire loop.
+
+    \item \textbf{Common-mode (CM) current} flows in the \emph{same}
+          direction on both wires simultaneously.  It is driven by
+          the stray capacitances from both conductors to the ground
+          reference.  A current clamp around both wires together
+          reads \emph{twice} the CM current — the two contributions
+          add instead of cancelling.  CM current escapes to ground
+          and is the root cause of conducted EMI.
+\end{itemize}
+\end{circuitbox}
+
+Mathematically, for a two-wire system:
+\begin{align}
+    i_{\mathrm{CM}} &= i_1 + i_2
+        \qquad \text{(both wires, same direction)} \\
+    i_{12}          &= \tfrac{1}{2}(i_1 - i_2)
+        \qquad \text{(DM, push-pull component)}
+\end{align}
+
+This extends naturally to $N$ wires: the CM current is the \emph{sum}
+of all line currents and the CM voltage is the \emph{average}
+line-to-reference voltage.  There are $N-1$ independent DM
+combinations and one CM quantity, giving $N$ quantities total — the
+same count as the original $N$ line currents.  This is exactly the
+transformation the paper formalises.
+
+% ------------------------------------------------------------
+\subsection{What Is a CM Equivalent Circuit and Why Do We Need One?}
+% ------------------------------------------------------------
+
+A \emph{CM equivalent circuit} (CEM) is a reduced-order model that
+retains only the CM current paths of a power converter.  It replaces
+the full switching-circuit detail with a handful of impedances
+(capacitors, inductors, resistors) driven by voltage sources that
+are functions of the switch voltages.
+
+\begin{physbox}[The Payoff]
+Once you have a CEM you can:
+(1) predict CM current without running a full detailed simulation;
+(2) design a CM filter to suppress it; and
+(3) understand which component is the dominant noise source so you
+can target design changes efficiently.
+\end{physbox}
+
+For a \emph{symmetric} system — where every component on line 1 is
+identical to the corresponding component on line 2, etc.\ — deriving
+a CEM is a textbook operation: parallel combinations of symmetric
+impedances give the CM equivalent by inspection.  The DM and CM
+equations are completely independent; you can analyse each in
+isolation.
+
+The difficulty arises when the circuit is \emph{asymmetric}.
+
+% ------------------------------------------------------------
+\subsection{The Asymmetry Problem}
+% ------------------------------------------------------------
+
+Inside a SiC multichip power module (MCPM), multiple transistor chips
+share a common copper baseplate used for thermal management.  Each
+chip terminal (drain, source, and phase node) has a parasitic
+capacitance to that baseplate — formed by the dielectric layers in
+the module package.
+
+Due to the internal structure of the MCPM, the
+\textbf{source-to-baseplate capacitance is smaller} than the
+drain-to-baseplate and phase-to-baseplate capacitances.  The paper
+captures this imbalance with a single asymmetry parameter $k < 1$:
+the source-to-baseplate capacitance is $k\Cp$ while the other two are
+each $\Cp$.
+
+\begin{warningbox}[Why Asymmetry Is Dangerous]
+In a symmetric system, DM switching waveforms drive only DM currents
+and CM paths carry only CM contributions.  \textbf{Asymmetry breaks
+this independence.}  A DM voltage oscillation — caused by the normal
+switching action — can now ``pump'' current into the CM path.  DM
+noise converts to CM noise directly through the imbalanced
+capacitances.  Without a systematic model, it is impossible to predict
+how much conversion occurs.
+\end{warningbox}
+
+The paper answers exactly this question: given a specific asymmetry
+parameter $k$, how much DM-to-CM coupling is induced, and what does
+the resulting CM equivalent circuit look like?  The answer comes in
+the form of a \emph{DM-dependent voltage source} that appears inside
+the CEM whenever $k \neq 1$.  When $k = 1$ (perfect symmetry) that
+source equals zero and the CEM reduces to the standard symmetric
+result.
+
+% ------------------------------------------------------------
+\subsection{Prerequisites}
+% ------------------------------------------------------------
+
+\begin{statebox}[What You Need Before Starting]
+\begin{itemize}
+    \item \textbf{KVL and KCL in matrix form} — writing $N$ loop or
+          node equations as a single matrix equation.
+    \item \textbf{Impedance notation} — $Z_R = R$, $Z_L = pL$,
+          $Z_C = \frac{1}{pC}$, where $p = d/dt$ is the Heaviside
+          (time-derivative) operator.
+    \item \textbf{Matrix multiplication and linear transformations}
+          — how multiplying both sides of an equation by a matrix
+          changes the basis of the unknowns.
+    \item \textbf{Half-bridge converter operation} — the two switch
+          states, what the phase voltage $v_A$ looks like, and the
+          dc-bus voltage $\Vdc$.
+    \item \textbf{What a Fourier series does (conceptually)} — that
+          a periodic switched waveform contains harmonics at integer
+          multiples of the switching frequency.
+\end{itemize}
+\end{statebox}
+
+% ------------------------------------------------------------
+\subsection{Symbol Table}
+% ------------------------------------------------------------
+
+\begin{center}
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{lll}
+\toprule
+\textbf{Symbol} & \textbf{Meaning} & \textbf{Units} \\
+\midrule
+$N$                 & Number of lines in the system                  & --- \\
+$i_n$               & Current on line $n$                            & A   \\
+$v_{nP}$            & Voltage from line $n$ to floating reference $P$ & V   \\
+$v_{Pg}$            & Voltage from reference $P$ to ground            & V   \\
+$P$                 & Arbitrary floating reference point              & --- \\
+$\icm$              & Common-mode current: $\sum_{n=1}^{N} i_n$      & A   \\
+$\vcm$              & CM voltage: $\frac{1}{N}\sum_{n=1}^{N} v_{nP}$ & V   \\
+$i_{mn}$            & DM current between lines $m$ and $n$           & A   \\
+$v_{mn}$            & DM voltage between lines $m$ and $n$           & V   \\
+$\Ni$               & DM current normalisation factor (= 2 in paper) & --- \\
+$\TiN$, $\TvN$      & Current and voltage transformation matrices     & --- \\
+$\iDCM$, $\vDCM$    & Vectors of decomposed DM and CM quantities      & A, V \\
+$\mathbf{R}$        & Resistance matrix of $N$-line model             & $\Omega$ \\
+$\mathbf{L}$        & Inductance matrix                               & H   \\
+$\mathbf{S}$        & Elastance matrix ($\mathbf{S} = \mathbf{C}^{-1}$) & F$^{-1}$ \\
+$k$                 & Asymmetry parameter ($< 1$ for real MCPM)      & --- \\
+$\Cp$               & Nominal baseplate parasitic capacitance         & F   \\
+$\Rh$               & Heat-sink resistance to ground                  & $\Omega$ \\
+$k\Cp$              & Source-to-baseplate capacitance (smaller line)  & F   \\
+$v_{Q1}$, $v_{Q2}$  & Voltages across upper and lower switches        & V   \\
+$\Vdc$              & DC bus voltage                                  & V   \\
+CEM                 & Common-mode equivalent model                    & --- \\
+MM                  & Mixed-mode (DM and CM entangled)                & --- \\
+DCM                 & Decomposed differential-common-mode set         & --- \\
+LISN                & Line impedance stabilisation network            & --- \\
+MCPM                & Multichip power module                          & --- \\
+\bottomrule
+\end{tabular}
+\end{center}
+

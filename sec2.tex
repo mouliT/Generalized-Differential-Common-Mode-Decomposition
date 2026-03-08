@@ -1,0 +1,1025 @@
+% ============================================================
+\section{How Asymmetry Couples the Two Modes}
+% ============================================================
+
+Section~1 defined the DM/CM quantities and built the transformation
+matrices.  Now we put those matrices to work on the actual circuit
+equations.  The central question is:
+
+\begin{center}
+\emph{If you apply $\TiN$ and $\TvN$ to the $N$-line circuit
+equations, what structure emerges — and what changes when one
+capacitor is $kC$ instead of $C$?}
+\end{center}
+
+The answer splits into two cases.  For a \emph{symmetric} system
+($k = 1$, all capacitors equal) the transformed equations break
+into $N-1$ independent DM equations and one CM equation — the two
+modes are electrically invisible to each other.  For an
+\emph{asymmetric} system ($k \neq 1$) the capacitor mismatch
+injects a coupling term: a DM voltage oscillation drives a CM
+current directly.  This DM-to-CM conversion is the root cause of
+asymmetry-induced conducted EMI.
+
+% ------------------------------------------------------------
+\subsection{The N-Line Circuit Equations}
+% ------------------------------------------------------------
+
+The goal of this section is to write down the circuit equations in
+the original per-line variables before any DM--CM transformation.
+We build them up one component at a time — no matrices yet.
+
+% ---- single line ----
+\subsubsection*{Step 1 — Pick One Line and Label It}
+
+Look at \figref{fig:P1Fig1} and single out \emph{line~$n$}.
+It contains three circuit elements in the path from the left input
+terminal to ground:
+
+\begin{circuitbox}[Elements on Line $n$ (from left to right)]
+\begin{itemize}
+    \item \textbf{Series resistor $R$:} models wiring resistance,
+          bond-wire resistance, busbar loss.
+    \item \textbf{Series inductor $L$:} models trace or cable
+          inductance.
+    \item \textbf{Shunt capacitor $C_n$:} parasitic capacitance
+          from line~$n$ to the grounded baseplate.
+          Lines $1$ to $N-1$ have $C_n = C$;
+          line~$N$ has $C_N = kC$ (the asymmetric one).
+\end{itemize}
+Current $i_n$ flows left to right through $R$ and $L$, then
+down through $C_n$ to ground.
+\end{circuitbox}
+
+% ---- left terminal voltage ----
+\subsubsection*{Step 2 — What Is the Driving Voltage?}
+
+The left terminal of line~$n$ sits at voltage $v_{nP}$ with
+respect to the floating reference~$P$.
+But $P$ is not ground — it is at $v_{Pg}$ above ground
+(recall \S1.2).  So the voltage of line~$n$'s left terminal
+\emph{with respect to ground} is:
+\[
+    v_{n,\mathrm{gnd}}
+    = \underbrace{v_{nP}}_{\text{line to }P}
+    + \underbrace{v_{Pg}}_{P\text{ to ground}}
+    = v_{nP} + v_{Pg}.
+\]
+This is the total voltage that drives current through the series
+$R$--$L$--$C_n$ path to ground.
+
+% ---- EMI approximation ----
+\begin{physbox}[EMI-Frequency Approximation: Why $i_n$ Flows Entirely Through $C_n$]
+Look carefully at Fig.~\ref{fig:P1Fig1}.  In general, line $n$ carries
+\emph{two} currents: $i_n$ entering from the left, and $i_n'$ leaving
+to the right toward the load.  By KCL at the junction above $C_n$:
+\[
+    i_{C_n} = i_n - i_n'.
+\]
+The \emph{exact} capacitor voltage drop is therefore
+$v_{C_n} = (i_n - i_n')/(p\,C_n)$, \emph{not} simply $i_n/(p\,C_n)$.
+
+\textbf{Why can we use $i_n$ alone?}  At EMI frequencies (tens of kHz
+and above), the shunt capacitor $C_n$ looks like a near-short circuit:
+\[
+    \frac{1}{\omega C_n} \ll Z_{\mathrm{load}}.
+\]
+The high-frequency current strongly prefers the low-impedance
+cap-to-ground path over the load path.  As a result,
+\[
+    i_n' \approx 0
+    \quad\Longrightarrow\quad
+    i_{C_n} \approx i_n.
+\]
+\textbf{Every voltage drop written in Step 3, and every equation that
+follows, uses this approximation.}
+\end{physbox}
+
+% ---- three voltage drops ----
+\subsubsection*{Step 3 — Write the Voltage Drop Across Each Element}
+
+\textbf{Resistor} $R$: by Ohm's law the voltage drop is
+\[
+    v_R = R\, i_n.
+\]
+
+\textbf{Inductor} $L$: by Faraday's law the voltage drop is
+\[
+    v_L = L\,\frac{d\,i_n}{d\,t}.
+\]
+Shorthand: define the operator $p \triangleq d/dt$
+(called the \emph{Heaviside operator}).  Then
+$v_L = pL\cdot i_n$.  Every time you see $p$ in front of
+something, read it as ``multiply by $d/dt$''.
+
+\textbf{Capacitor} $C_n$: the capacitor accumulates charge
+$Q = \int i_n\,dt$.  Its terminal voltage is
+\[
+    v_{C_n} = \frac{Q}{C_n}
+            = \frac{1}{C_n}\int i_n\,dt
+            = \frac{i_n}{p\,C_n}.
+\]
+The last step uses $1/p \equiv \int dt$ (integration is the
+inverse of differentiation).
+
+% ---- KVL ----
+\subsubsection*{Step 4 — Apply KVL}
+
+The driving voltage equals the sum of the three drops:
+\[
+    v_{nP} + v_{Pg}
+    = \underbrace{R\,i_n}_{v_R}
+    + \underbrace{pL\cdot i_n}_{v_L}
+    + \underbrace{\dfrac{i_n}{p\,C_n}}_{v_{C_n}}.
+\]
+Factor out $i_n$:
+
+\begin{eqnbox}[Per-Line KVL — One Equation for Line $n$]
+\begin{equation}
+    v_{nP} + v_{Pg}
+    = \Bigl(R + pL + \frac{1}{p\,C_n}\Bigr)\,i_n
+    \label{eq:KVL_one}
+\end{equation}
+\end{eqnbox}
+
+This is the fundamental equation.  Everything that follows is just
+writing it $N$ times and packing it into a matrix.
+
+% ---- elastance ----
+\subsubsection*{Step 5 — Introduce Elastance $S_n = 1/C_n$}
+
+Define the \emph{elastance} of the shunt cap on line~$n$:
+\[
+    S_n \triangleq \frac{1}{C_n}.
+\]
+Then $\dfrac{1}{pC_n} = \dfrac{S_n}{p}$, and
+Eq.~\eqref{eq:KVL_one} becomes:
+\[
+    v_{nP} + v_{Pg}
+    = \Bigl(R + pL + \frac{S_n}{p}\Bigr)\,i_n.
+\]
+
+\begin{physbox}[Why Bother Naming $1/C_n$ as $S_n$?]
+In the per-line equation, $1/C_n$ always appears together with
+the operator $1/p$.  When we stack $N$ equations into a matrix
+(Step~6 below), the $1/p$ factor will appear \emph{outside} the
+matrix, while the capacitances appear \emph{inside} as matrix entries.
+Writing $S_n$ keeps the two roles cleanly separated:
+\[
+    \frac{S_n}{p}\cdot i_n
+    \;\longrightarrow\;
+    \frac{1}{p}\,\mathbf{S}_N\,\mathbf{i}.
+\]
+The matrix $\mathbf{S}_N$ holds the circuit parameters;
+$1/p$ is the integrating operator that sits in front.
+\end{physbox}
+
+The numerical values of the elastances in the $N$-line model are:
+\[
+    S_1 = S_2 = \cdots = S_{N-1} = \frac{1}{C},
+    \qquad
+    S_N = \frac{1}{kC}.
+\]
+
+% ---- N equations ----
+\subsubsection*{Step 6 — Write the Equation for Every Line}
+
+Applying Eq.~\eqref{eq:KVL_one} to each of the $N$ lines:
+\begin{align*}
+    v_{1P} + v_{Pg}
+        &= \Bigl(R + pL + \tfrac{1}{pC}\Bigr)\,i_1 \\[4pt]
+    v_{2P} + v_{Pg}
+        &= \Bigl(R + pL + \tfrac{1}{pC}\Bigr)\,i_2 \\[4pt]
+        &\;\vdots \\[4pt]
+    v_{(N-1)P} + v_{Pg}
+        &= \Bigl(R + pL + \tfrac{1}{pC}\Bigr)\,i_{N-1} \\[4pt]
+    v_{NP} + v_{Pg}
+        &= \Bigl(R + pL + \tfrac{1}{kpC}\Bigr)\,i_N
+\end{align*}
+
+Three things to notice:
+\begin{itemize}
+    \item $v_{Pg}$ appears in \textbf{every} equation — it is a
+          common additive term on the left of all $N$ lines.
+    \item The coefficient $(R + pL)$ is \textbf{identical} across
+          all $N$ lines.
+    \item The cap term differs \textbf{only on the last line}:
+          $1/(pC)$ for lines 1 to $N-1$, but $1/(kpC)$ for line $N$.
+\end{itemize}
+
+% ---- matrix stacking ----
+\subsubsection*{Step 7 — Stack into a Matrix Equation}
+
+Collect the $N$ unknowns and $N$ driving voltages into column
+vectors:
+\[
+    \mathbf{i} = \begin{bmatrix} i_1 \\ \vdots \\ i_N \end{bmatrix},
+    \qquad
+    \mathbf{v}_{nP} = \begin{bmatrix} v_{1P} \\ \vdots \\ v_{NP} \end{bmatrix},
+    \qquad
+    \mathbf{1}_N = \begin{bmatrix} 1 \\ \vdots \\ 1 \end{bmatrix}.
+\]
+
+The shared term $v_{Pg}$ multiplies the all-ones vector
+$\mathbf{1}_N$, because it appears on the left of \emph{every}
+equation.  The right-hand side has a coefficient matrix
+$\mathbf{Z}$ that encodes both the $R$--$L$ and the cap
+contributions.  Since $(R + pL)$ is the same on every line, it
+contributes $(R + pL)\,\mathbf{I}_N$ (scalar times identity).
+The cap terms differ line by line, so they contribute
+$(1/p)\,\mathbf{S}_N$ where $\mathbf{S}_N$ is a diagonal matrix
+of elastances.  Putting it all together:
+
+\begin{eqnbox}[Mixed-Mode Circuit Equations — Eq.~9 in paper]
+\begin{equation}
+    \mathbf{Z}\,\mathbf{i}
+    = \mathbf{v}_{nP} + v_{Pg}\,\mathbf{1}_N
+    \label{eq:MMeqn}
+\end{equation}
+where
+\[
+    \mathbf{Z}
+    = (R + pL)\,\mathbf{I}_N + \frac{1}{p}\,\mathbf{S}_N,
+    \qquad
+    \mathbf{S}_N
+    = \operatorname{diag}\!\Bigl(
+        \underbrace{\tfrac{1}{C},\;\ldots,\;\tfrac{1}{C}}_{N-1},\;
+        \tfrac{1}{kC}
+      \Bigr).
+\]
+\end{eqnbox}
+
+This is just $N$ copies of Eq.~\eqref{eq:KVL_one} written
+at once.  No new physics — only compact notation.
+
+\textit{Note — why ``mixed-mode''?}  Each per-line current $i_n$
+is a blend of both DM and CM contributions (recall the inverse
+transform in \S1.6).  This equation is written in those
+\emph{un-decomposed} per-line variables, so DM and CM are mixed
+together inside every $i_n$ and $v_{nP}$.  The next subsection
+applies the transformation to separate them.
+
+\begin{statebox}[Two Observations About $\mathbf{Z}$]
+\begin{itemize}
+    \item \textbf{$(R + pL)\,\mathbf{I}_N$ is a scaled identity.}
+          Every line has the same $R$ and $L$, so this block is
+          perfectly symmetric.  It will transform very cleanly in
+          the next section.
+    \item \textbf{$\mathbf{S}_N$ is diagonal but not symmetric}
+          when $k \neq 1$.  All entries equal $1/C$ except the
+          last, which is $1/(kC)$.  This is the \textbf{only}
+          source of asymmetry in the entire equation — and
+          therefore the only possible source of DM--CM coupling
+          after the transformation.
+\end{itemize}
+\end{statebox}
+
+% ------------------------------------------------------------
+\subsection{Applying the DM--CM Transformation}
+% ------------------------------------------------------------
+
+\begin{physbox}[Why Transform? — The Motivation]
+The mixed-mode equation~\eqref{eq:MMeqn} is correct, but it is written
+in \emph{per-line} variables $(i_1, \ldots, i_N)$ and
+$(v_{1P}, \ldots, v_{NP})$.  Nobody in EMC measures per-line currents
+directly — a conducted-emissions test measures CM current, and a
+switching converter generates DM voltage.  The question we actually
+want to answer is: \emph{``a DM voltage drives the circuit; how much
+CM current results?''}  That answer is buried and unreadable in the
+per-line form.
+
+The fix is a \textbf{change of coordinates}: replace the per-line
+variables with the DM and CM variables defined in \S1.  The
+transformation matrices $\TiN$ and $\TvN$ are not new objects — they
+are exactly the DM/CM definitions from \S1 written as matrices.
+Applying them to both sides of Eq.~\eqref{eq:MMeqn} is the
+\emph{same physics}, re-expressed in a language where DM and CM are
+explicit.  The payoff: if the circuit is symmetric the resulting
+impedance matrix $\mathbf{Z}_\mathrm{DCM}$ is diagonal (no coupling);
+if it is asymmetric, off-diagonal entries appear — and those
+\emph{are} the DM--CM coupling, now directly readable.
+\end{physbox}
+
+Multiply Eq.~\eqref{eq:MMeqn} on the left by $\TvN$, then
+substitute $\mathbf{i} = (\TiN)^{-1}\iDCM$:
+\[
+    \underbrace{\TvN\,\mathbf{Z}\,(\TiN)^{-1}}_{\mathbf{Z}_{\mathrm{DCM}}}
+    \;\iDCM
+    \;=\;
+    \vDCM
+    \;+\; v_{Pg}\,\underbrace{\TvN\,\mathbf{1}_N}_{\mathbf{e}_N}.
+\]
+
+\begin{eqnbox}[DCM Equations — Eq.~10 in paper]
+\begin{equation}
+    \mathbf{Z}_{\mathrm{DCM}}\,\iDCM
+    = \vDCM + v_{Pg}\,\mathbf{e}_N
+    \label{eq:DCMeqn}
+\end{equation}
+where $\mathbf{Z}_{\mathrm{DCM}} = \TvN\,\mathbf{Z}\,(\TiN)^{-1}$
+and $\mathbf{e}_N = [0,\ldots,0,1]^T$ is the $N$-th unit vector.
+\end{eqnbox}
+
+\subsubsection*{Why $\TvN\,\mathbf{1}_N = \mathbf{e}_N$}
+
+Verify for $N = 2$:
+\[
+\TvN\,\mathbf{1}_2
+=
+\begin{bmatrix}
+1 & -1 \\ \tfrac{1}{2} & \tfrac{1}{2}
+\end{bmatrix}
+\begin{bmatrix}1 \\ 1\end{bmatrix}
+=
+\begin{bmatrix}1-1 \\ \tfrac{1}{2}+\tfrac{1}{2}\end{bmatrix}
+=
+\begin{bmatrix}0 \\ 1\end{bmatrix}
+= \mathbf{e}_2.
+\]
+Every DM row of $\TvN$ has a $+1$ and a $-1$ in adjacent columns
+(difference of a constant = 0); the CM row has all $+1/N$ (sum = 1).
+
+\begin{statebox}[$v_{Pg}$ Lives Only in the CM Equation]
+Because $v_{Pg}$ is multiplied by $\mathbf{e}_N$, it appears in the
+\textbf{CM equation only} — absent from every DM equation.
+DM quantities are completely independent of the ground connection.
+This confirms the physical intuition: DM current is a loop current
+confined to the wire bundle; only the CM path connects to ground
+through $v_{Pg}$.
+\end{statebox}
+
+\subsubsection*{Expanding $\mathbf{Z}_{\mathrm{DCM}}$}
+
+Since $\mathbf{Z} = (R + pL)\,\mathbf{I}_N + (1/p)\,\mathbf{S}_N$,
+linearity gives:
+\[
+    \mathbf{Z}_{\mathrm{DCM}}
+    = (R + pL)\underbrace{\TvN(\TiN)^{-1}}_{\displaystyle\mathbf{M}}
+    + \frac{1}{p}\underbrace{\TvN\,\mathbf{S}_N\,(\TiN)^{-1}}
+                             {\displaystyle\mathbf{S}_{\mathrm{DCM}}}.
+\]
+
+\paragraph{$\mathbf{M} = \TvN(\TiN)^{-1}$ is always diagonal.}
+
+Computing for $N = 2$:
+\[
+    (\TiN)^{-1}
+    = \begin{bmatrix}1 & \tfrac{1}{2} \\[3pt] -1 & \tfrac{1}{2}\end{bmatrix},
+    \qquad
+    \mathbf{M}
+    =
+    \begin{bmatrix}1 & -1 \\[3pt] \tfrac{1}{2} & \tfrac{1}{2}\end{bmatrix}
+    \begin{bmatrix}1 & \tfrac{1}{2} \\[3pt] -1 & \tfrac{1}{2}\end{bmatrix}
+    =
+    \begin{bmatrix}2 & 0 \\[3pt] 0 & \tfrac{1}{2}\end{bmatrix}.
+\]
+
+The entries are $\Ni = 2$ for the DM row and $1/N = 1/2$ for the CM
+row.  For all $N$:
+$\mathbf{M} = \operatorname{diag}(\Ni,\ldots,\Ni,\,1/N)$.
+
+\begin{circuitbox}[Physical Meaning of $\mathbf{M}$]
+\begin{itemize}
+    \item DM: $R_{\mathrm{DM}} = \Ni R = 2R$,\; $L_{\mathrm{DM}} = 2L$
+          — DM current flows through both $R$'s in series. \checkmark
+    \item CM: $R_{\mathrm{CM}} = R/N = R/2$,\; $L_{\mathrm{CM}} = L/2$
+          — CM current splits equally across both lines in parallel. \checkmark
+    \item \textbf{No off-diagonal entries.}  $R$ and $L$ never couple
+          DM to CM regardless of capacitor asymmetry.
+\end{itemize}
+\end{circuitbox}
+
+\paragraph{$\mathbf{S}_{\mathrm{DCM}} = \TvN\,\mathbf{S}_N\,(\TiN)^{-1}$
+depends on $k$.}
+
+This is the key computation.  For $N = 2$ with
+$\mathbf{S}_2 = \operatorname{diag}(1/C,\;1/(kC))$:
+
+\textbf{Stage A} — left-multiply by $\TvN$:
+\[
+\begin{bmatrix}1 & -1 \\[3pt] \tfrac{1}{2} & \tfrac{1}{2}\end{bmatrix}
+\begin{bmatrix}\tfrac{1}{C} & 0 \\[3pt] 0 & \tfrac{1}{kC}\end{bmatrix}
+=
+\begin{bmatrix}
+    \tfrac{1}{C}  & -\tfrac{1}{kC} \\[6pt]
+    \tfrac{1}{2C} & \tfrac{1}{2kC}
+\end{bmatrix}.
+\]
+
+\textbf{Stage B} — right-multiply by $(\TiN)^{-1}$:
+\[
+\begin{bmatrix}
+    \tfrac{1}{C}  & -\tfrac{1}{kC} \\[6pt]
+    \tfrac{1}{2C} & \tfrac{1}{2kC}
+\end{bmatrix}
+\begin{bmatrix}1 & \tfrac{1}{2} \\[3pt] -1 & \tfrac{1}{2}\end{bmatrix}
+=
+\frac{1}{C}
+\begin{bmatrix}
+    \dfrac{k+1}{k}  & \dfrac{k-1}{2k}  \\[10pt]
+    \dfrac{k-1}{2k} & \dfrac{k+1}{4k}
+\end{bmatrix}.
+\]
+
+\begin{eqnbox}[DCM Elastance Matrix ($N = 2$) — Eq.~16 in paper]
+\begin{equation}
+\mathbf{S}_{\mathrm{DCM}}
+= \frac{1}{C}
+  \begin{bmatrix}
+      \dfrac{k+1}{k}  & \dfrac{k-1}{2k}  \\[10pt]
+      \dfrac{k-1}{2k} & \dfrac{k+1}{4k}
+  \end{bmatrix}
+\label{eq:Sdcm}
+\end{equation}
+Off-diagonal entry $\tfrac{1}{C}\cdot\tfrac{k-1}{2k}$ is the
+\textbf{DM--CM coupling elastance}.
+It is zero if and only if $k = 1$.
+\end{eqnbox}
+
+% ------------------------------------------------------------
+\subsection{Case 1 — Symmetric ($k = 1$): Modes Fully Decouple}
+% ------------------------------------------------------------
+
+Substituting $k = 1$ into Eq.~\eqref{eq:Sdcm}:
+\[
+\mathbf{S}_{\mathrm{DCM}}\big|_{k=1}
+=
+\frac{1}{C}\begin{bmatrix}2 & 0 \\ 0 & \tfrac{1}{2}\end{bmatrix}.
+\]
+Off-diagonal = 0.  The two rows of Eq.~\eqref{eq:DCMeqn} are
+completely independent:
+
+\begin{eqnbox}[Symmetric Decoupled Equations — Eqs.~14 and 15 in paper]
+\begin{align}
+    \Bigl(2R + 2pL + \frac{2}{pC}\Bigr)\,i_{12}
+        &= v_{12}
+        \label{eq:DM_sym} \\[6pt]
+    \Bigl(\frac{R}{2} + \frac{pL}{2} + \frac{1}{2pC}\Bigr)\,\icm
+        &= \vcm + v_{Pg}
+        \label{eq:CM_sym}
+\end{align}
+\end{eqnbox}
+
+\begin{circuitbox}[Reading the Symmetric Equations]
+\begin{itemize}
+    \item \textbf{DM (Eq.~\ref{eq:DM_sym}):} $i_{12}$ sees
+          \emph{series} elements — $2R$, $2L$, and elastance $2/C$
+          (two capacitors $C$ in series give $C/2$, elastance $2/C$).
+          No $v_{Pg}$ — DM is ground-independent.
+    \item \textbf{CM (Eq.~\ref{eq:CM_sym}):} $\icm$ sees
+          \emph{parallel} elements — $R/2$, $L/2$, and elastance
+          $1/(2C)$ (two $C$'s in parallel give $2C$, elastance $1/(2C)$).
+          $v_{Pg}$ drives the CM current — this is the EMI path.
+    \item \textbf{No coupling:} a DM voltage source excites zero CM
+          current, and vice versa.  This is the ideal symmetric world.
+\end{itemize}
+\end{circuitbox}
+
+% ------------------------------------------------------------
+\subsection{Case 2 — Asymmetric ($k \neq 1$): Coupling Appears}
+% ------------------------------------------------------------
+
+With $k \neq 1$, the off-diagonal entries of $\mathbf{S}_{\mathrm{DCM}}$
+are non-zero.  Expanding Eq.~\eqref{eq:DCMeqn} row by row:
+
+\begin{eqnbox}[Asymmetric Coupled Equations ($N = 2$)]
+\begin{align}
+    \Bigl(2R + 2pL + \frac{k+1}{kpC}\Bigr)\,i_{12}
+    + \frac{k-1}{2kpC}\,\icm
+        &= v_{12}
+        \label{eq:DM_asym} \\[6pt]
+    \frac{k-1}{2kpC}\,i_{12}
+    + \Bigl(\frac{R}{2} + \frac{pL}{2} + \frac{k+1}{4kpC}\Bigr)\,\icm
+        &= \vcm + v_{Pg}
+        \label{eq:CM_asym}
+\end{align}
+\end{eqnbox}
+
+The term $\tfrac{k-1}{2kpC}$ appears in \emph{both} equations —
+it links $i_{12}$ and $\icm$ bidirectionally.
+
+\begin{warningbox}[The Coupling Term $\dfrac{k-1}{2kpC}$]
+\begin{itemize}
+    \item $k = 1$: coupling $= 0$.  Eqs.~\eqref{eq:DM_asym} and
+          \eqref{eq:CM_asym} reduce exactly to
+          Eqs.~\eqref{eq:DM_sym} and \eqref{eq:CM_sym}. \checkmark
+    \item $k < 1$ (real MCPM — source cap is smaller):
+          coupling is negative.  A positive DM oscillation drives
+          CM current in the opposite direction.
+    \item The coupling is \emph{purely capacitive} (the $1/p$ factor
+          means it behaves like a capacitor element in the circuit).
+          Changing $R$ or $L$ cannot remove it — only restoring
+          $k = 1$ sets the coupling to zero.
+\end{itemize}
+\end{warningbox}
+
+% ------------------------------------------------------------
+\subsection{Numerical Proof — The 2\texorpdfstring{$\times$}{×}2
+            Case Study}
+% ------------------------------------------------------------
+
+The algebra of \S2.1--\S2.4 shows \emph{why} the coupling term exists.
+The most direct verification is a concrete number: start from
+Eq.~\eqref{eq:Sdcm}, pick real component values, and check whether
+a DM excitation alone can produce a CM current.
+
+\medskip
+\textbf{The question we answer:}
+\begin{center}
+\emph{Apply a 1\,V sinusoidal DM voltage with no CM source.
+      How much CM current flows?}
+\end{center}
+If the answer is zero the modes are decoupled; if non-zero, then a
+DM switching waveform is generating conducted EMI by itself — with
+no CM voltage source required.
+
+\subsubsection*{Setup (using \S1 notation throughout)}
+
+Recall from \S1.5 that the $N = 2$ decomposition encodes:
+$i_{12} = (i_1 - i_2)/2$ (DM) and $\icm = i_1 + i_2$ (CM),
+with the same split for voltages.
+We now work entirely in this DM--CM coordinate system.
+
+Choose the simplest parameter set that isolates the capacitor effect:
+
+\begin{itemize}
+    \item \textbf{Shunt capacitances:} $C = 1\,\text{nF}$ for
+          line~1; $kC$ for line~2 (the asymmetric cap introduced
+          in \figref{fig:P1Fig1}).
+    \item \textbf{DM excitation:} $V_{12} = 1\angle 0°\,\text{V}$
+          at $f = 1\,\text{MHz}$ ($\omega = 2\pi f \approx
+          6.28 \times 10^6\,\text{rad/s}$).  Phasor notation:
+          $p \to j\omega$.
+    \item \textbf{No CM source:} $V_{\mathrm{CM}} = 0$ and
+          $V_{Pg} = 0$.  This is the critical choice — we want
+          to see whether DM alone drives $\icm$.
+    \item \textbf{Series elements:} $R = L = 0$ to isolate the
+          capacitor contribution.  (Including $R$ and $L$ only
+          adds the diagonal matrix $\mathbf{M}$ from \S2.2 —
+          diagonal matrices never couple DM to CM, so they
+          cannot change the conclusion.)
+\end{itemize}
+
+With $R = L = 0$ and $p \to j\omega$, Eq.~\eqref{eq:DCMeqn}
+reduces to
+$\mathbf{S}_{\mathrm{DCM}}/(j\omega) \cdot \mathbf{I}_{\mathrm{DCM}}
+= \mathbf{V}_{\mathrm{DCM}}$.
+Substituting Eq.~\eqref{eq:Sdcm} gives the phasor system we will
+solve twice — once for $k = 1$ and once for $k = 0.5$:
+
+\begin{eqnbox}[2-Line Phasor System Under Pure DM Excitation]
+\begin{equation}
+\frac{1}{j\omega C}
+\begin{bmatrix}
+    \dfrac{k+1}{k}  & \dfrac{k-1}{2k} \\[10pt]
+    \dfrac{k-1}{2k} & \dfrac{k+1}{4k}
+\end{bmatrix}
+\begin{bmatrix} I_{12} \\[4pt] I_{\mathrm{CM}} \end{bmatrix}
+=
+\begin{bmatrix} 1\,\mathrm{V} \\[4pt] 0 \end{bmatrix}
+\label{eq:num_sys}
+\end{equation}
+Right-hand side: $[V_{12},\;V_{\mathrm{CM}}+V_{Pg}]^T = [1\,\mathrm{V},\;0]^T$.
+A non-zero $I_{\mathrm{CM}}$ in the solution means the DM voltage
+alone is generating CM current — the definition of asymmetry-induced
+EMI.
+\end{eqnbox}
+
+% ---- Case A ----
+\subsubsection*{Case A — Symmetric ($k = 1$): modes stay silent}
+
+Substitute $k = 1$.  The off-diagonal of Eq.~\eqref{eq:Sdcm}
+becomes $\tfrac{k-1}{2k}\big|_{k=1} = 0$, so
+Eq.~\eqref{eq:num_sys} becomes:
+\[
+\frac{1}{j\omega C}
+\begin{bmatrix} 2 & 0 \\ 0 & \tfrac{1}{2} \end{bmatrix}
+\begin{bmatrix} I_{12} \\ I_{\mathrm{CM}} \end{bmatrix}
+=
+\begin{bmatrix} 1\,\mathrm{V} \\ 0 \end{bmatrix}.
+\]
+The matrix is block-diagonal: \textbf{Row 1 and Row 2 are
+completely independent.}  Row 2 alone gives:
+\[
+    \frac{1}{2j\omega C}\,I_{\mathrm{CM}} = 0
+    \quad\Longrightarrow\quad
+    \boxed{I_{\mathrm{CM}} = 0.}
+\]
+This holds for \emph{any} value of $V_{12}$.  The DM source is
+completely invisible to the CM equation.  Row 1 gives
+$I_{12} = j\omega C \cdot V_{12}/2$ (a nonzero DM current that
+circulates inside the wire bundle), but it drives zero ground
+current — exactly Eq.~\eqref{eq:DM_sym}.
+
+\begin{statebox}[What Decoupling Means in Practice]
+With $k = 1$, no matter how large or fast the DM switching
+transient is, $\icm = 0$ and no asymmetry-induced EMI reaches the
+LISN.  The only remaining EMI path is $V_{Pg}$ on the right-hand
+side of Eq.~\eqref{eq:CM_sym} — driven by the CM voltage of the
+power source, not by the DM switching waveform.
+\end{statebox}
+
+% ---- Case B ----
+\subsubsection*{Case B — Asymmetric ($k = 0.5$): DM drives CM current}
+
+SiC power-module source terminals typically have roughly half the
+parasitic capacitance of the drain terminal (see \S0.5), making
+$k \approx 0.5$ a realistic value.
+Substitute $k = 0.5$ into Eq.~\eqref{eq:Sdcm}:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{lcc}
+\toprule
+Matrix entry & Formula & Value at $k = 0.5$ \\
+\midrule
+DM self-elastance  & $(k+1)/k$    & $1.5/0.5 = 3$ \\
+Coupling (off-diag) & $(k-1)/(2k)$ & $-0.5/1.0 = -\,0.5$ \\
+CM self-elastance  & $(k+1)/(4k)$ & $1.5/2.0 = 0.75$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The phasor system (Eq.~\ref{eq:num_sys}) becomes:
+\[
+\frac{1}{j\omega C}
+\begin{bmatrix} 3 & -0.5 \\ -0.5 & 0.75 \end{bmatrix}
+\begin{bmatrix} I_{12} \\ I_{\mathrm{CM}} \end{bmatrix}
+=
+\begin{bmatrix} 1\,\mathrm{V} \\ 0 \end{bmatrix}.
+\]
+
+\textbf{Step 1 — solve Row 2 for $I_{\mathrm{CM}}$:}
+\[
+    -0.5\,I_{12} + 0.75\,I_{\mathrm{CM}} = 0
+    \quad\Longrightarrow\quad
+    I_{\mathrm{CM}} = \frac{0.5}{0.75}\,I_{12} = \frac{2}{3}\,I_{12}.
+\]
+The CM and DM currents are locked together by the off-diagonal term.
+
+\textbf{Step 2 — substitute into Row 1:}
+\[
+    3\,I_{12} + (-0.5)\cdot\tfrac{2}{3}\,I_{12}
+    = j\omega C \cdot 1\,\mathrm{V}
+    \;\;\Longrightarrow\;\;
+    \Bigl(3 - \tfrac{1}{3}\Bigr)I_{12} = j\omega C
+    \;\;\Longrightarrow\;\;
+    \frac{8}{3}\,I_{12} = j\omega C.
+\]
+\[
+    I_{12} = j\omega C \cdot \frac{3}{8}.
+\]
+
+\textbf{Step 3 — back-substitute to get $I_{\mathrm{CM}}$:}
+\[
+    I_{\mathrm{CM}}
+    = \frac{2}{3}\,I_{12}
+    = \frac{2}{3} \cdot j\omega C \cdot \frac{3}{8}
+    = \frac{j\omega C}{4}.
+\]
+
+\begin{eqnbox}[CM Current Generated by a Pure DM Source ($k=0.5$, $N=2$)]
+\begin{equation}
+    I_{\mathrm{CM}} = \frac{j\omega C}{4}\cdot V_{12}
+    \label{eq:ICM_result}
+\end{equation}
+\end{eqnbox}
+
+\textbf{Plug in numbers:} $C = 1\,\text{nF}$, $f = 1\,\text{MHz}$,
+$V_{12} = 1\,\text{V}$:
+\[
+|I_{\mathrm{CM}}|
+= \frac{2\pi \times 10^6 \times 10^{-9}}{4}
+= \frac{6.28 \times 10^{-3}}{4}
+\approx \mathbf{1.57\,\text{mA}}.
+\]
+A 1\,V DM voltage at 1\,MHz with $k = 0.5$ produces
+\textbf{1.57\,mA of CM current} — with no CM source, no $V_{Pg}$,
+purely from the capacitor mismatch.
+
+\begin{warningbox}[Connecting Back to \S1: What Does 1.57\,mA Mean?]
+From \S1.6 (Eq.~\ref{eq:inv_i1}) each line carries $\icm/2$ as its
+CM share.  So $I_{\mathrm{CM}} = 1.57\,\text{mA}$ means line~1
+carries $0.785\,\text{mA}$ more than line~2.  That imbalance is the
+\emph{same current} that the $\icm$ definition (Eq.~\ref{eq:icm})
+would measure with a clamp-meter around both wires — exactly the
+conducted EMI the LISN captures (recall \S0.4).
+The DM switching waveform acts as the pump; the capacitor
+mismatch ($k \neq 1$) is the valve that lets a fraction of it
+escape to the ground return.
+\end{warningbox}
+
+\begin{statebox}[Side-by-Side Summary: $k = 1$ vs.\ $k = 0.5$]
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Quantity}
+    & $k = 1$ (symmetric)
+    & $k = 0.5$ (asymmetric) \\
+\midrule
+Off-diag of $\mathbf{S}_{\mathrm{DCM}}$
+    & $0$ & $-0.5/C$ \\
+Equations coupled?
+    & No  & Yes \\
+$I_{12}$ (DM current)
+    & $j\omega C/2$
+    & $j\omega C \cdot 3/8$ \\
+$I_{\mathrm{CM}}$ given $V_{12}=1\,\text{V}$, $V_{\mathrm{CM}}=0$
+    & $0$
+    & $j\omega C/4$ \\
+$|I_{\mathrm{CM}}|$ at $C=1\,\text{nF}$, $f = 1\,\text{MHz}$
+    & $0\,\text{mA}$
+    & $1.57\,\text{mA}$ \\
+Asymmetry-induced EMI?
+    & \textbf{None}
+    & \textbf{Yes — from DM alone} \\
+\bottomrule
+\end{tabular}
+\end{center}
+Same DM excitation, identical $R$, $L$, $C$ values — only the
+ratio $k$ changed.  The CM current jumps from zero to 1.57\,mA.
+This is the numerical proof of the opening paragraph's claim.
+\end{statebox}
+
+% ---- N = 3 extension ----
+\subsubsection*{Extension to $N = 3$ Lines}
+
+The $N = 2$ proof captures the core result.  Extending to $N = 3$
+reveals an additional effect that $N = 2$ cannot show: when one
+capacitor is $kC$, asymmetry couples not only DM to CM, but also
+the two DM pairs \emph{to each other}.
+
+\subsubsection*{Step 1 — The $N = 3$ DCM Elastance Matrix}
+
+With $\mathbf{S}_3 = \operatorname{diag}(1/C,\;1/C,\;1/(kC))$
+(lines 1 and 2 symmetric, line 3 asymmetric at capacitance $kC$)
+and the $N = 3$ matrices from \S1.5, the same two-stage computation
+of \S2.2 gives:
+
+\begin{eqnbox}[DCM Elastance Matrix ($N = 3$, general $k$)]
+\begin{equation}
+\mathbf{S}_{\mathrm{DCM}}^{(3)}
+= \frac{1}{C}
+\begin{bmatrix}
+    2 & 0 & 0 \\[8pt]
+    \dfrac{2(1-k)}{3k} & \dfrac{2(k+2)}{3k} & \dfrac{k-1}{3k} \\[12pt]
+    \dfrac{2(k-1)}{9k} & \dfrac{4(k-1)}{9k} & \dfrac{2k+1}{9k}
+\end{bmatrix}
+\label{eq:Sdcm_N3}
+\end{equation}
+All off-diagonal entries are zero if and only if $k = 1$.
+\end{eqnbox}
+
+\begin{statebox}[Structural Observation: Row 1 is Always $k$-Independent]
+Row 1 is $[2/C,\;0,\;0]$ for \emph{any} $k$.  Lines 1 and 2 both
+have cap $C$, so the DM(1--2) equation never involves $kC$.
+Coupling enters only in rows 2 and 3 — DM pair (2--3) and CM —
+because both involve line 3.
+\end{statebox}
+
+\subsubsection*{Step 2 — The Phasor System}
+
+With $R = L = 0$ and $p \to j\omega$, under pure DM(1--2) excitation
+($V_{12} = 1\,\text{V}$, $V_{23} = V_{\mathrm{CM}} = V_{Pg} = 0$):
+
+\begin{eqnbox}[$N = 3$ Phasor System Under DM(1--2) Excitation Only]
+\begin{equation}
+\frac{1}{j\omega C}
+\begin{bmatrix}
+    2 & 0 & 0 \\[8pt]
+    \dfrac{2(1-k)}{3k} & \dfrac{2(k+2)}{3k} & \dfrac{k-1}{3k} \\[12pt]
+    \dfrac{2(k-1)}{9k} & \dfrac{4(k-1)}{9k} & \dfrac{2k+1}{9k}
+\end{bmatrix}
+\begin{bmatrix} I_{12} \\[4pt] I_{23} \\[4pt] I_{\mathrm{CM}} \end{bmatrix}
+=
+\begin{bmatrix} 1\,\mathrm{V} \\[4pt] 0 \\[4pt] 0 \end{bmatrix}
+\label{eq:num_sys_N3}
+\end{equation}
+\end{eqnbox}
+
+\subsubsection*{Case A — Symmetric ($k = 1$): three independent equations}
+
+At $k = 1$ every off-diagonal entry vanishes.  The matrix becomes
+diagonal and the three rows decouple:
+\[
+\frac{1}{j\omega C}
+\begin{bmatrix} 2 & 0 & 0 \\ 0 & 2 & 0 \\ 0 & 0 & \tfrac{1}{3} \end{bmatrix}
+\begin{bmatrix} I_{12} \\ I_{23} \\ I_{\mathrm{CM}} \end{bmatrix}
+=
+\begin{bmatrix} 1\,\mathrm{V} \\ 0 \\ 0 \end{bmatrix}.
+\]
+Each row gives one unknown immediately:
+\[
+    I_{12} = \frac{j\omega C}{2}, \qquad I_{23} = 0, \qquad
+    \boxed{I_{\mathrm{CM}} = 0.}
+\]
+Only the directly excited DM(1--2) current is non-zero.  DM(2--3)
+and CM are completely silent — modes are decoupled.
+
+\begin{statebox}[Diagonal Entries at $k = 1$: Circuit Check]
+\begin{itemize}
+    \item $S_{11} = 2/C$: DM(1--2) cap impedance.
+          Lines 1 and 2 each have cap $C$; their DM current sees
+          them in series $\Rightarrow$ $C/2$, elastance $= 2/C$. \checkmark
+    \item $S_{22} = 2/C$: DM(2--3) cap impedance.
+          At $k = 1$ lines 2 and 3 also have cap $C$; same
+          series result. \checkmark
+    \item $S_{33} = 1/(3C)$: CM cap impedance.
+          Three caps $C$ in parallel $\Rightarrow$ $3C$,
+          elastance $= 1/(3C)$. \checkmark
+\end{itemize}
+\end{statebox}
+
+\subsubsection*{Case B — Asymmetric ($k = 0.5$): coupling across all
+three equations}
+
+Substitute $k = 0.5$ into Eq.~\eqref{eq:Sdcm_N3}:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{lcc}
+\toprule
+Entry & Formula & Value at $k = 0.5$ \\
+\midrule
+$S_{21}$ (DM23 driven by DM12) & $2(1-k)/(3k)$  & $2/3$  \\
+$S_{22}$ (DM23 self)           & $2(k+2)/(3k)$  & $10/3$ \\
+$S_{23}$ (DM23 driven by CM)   & $(k-1)/(3k)$   & $-1/3$ \\
+$S_{31}$ (CM driven by DM12)   & $2(k-1)/(9k)$  & $-2/9$ \\
+$S_{32}$ (CM driven by DM23)   & $4(k-1)/(9k)$  & $-4/9$ \\
+$S_{33}$ (CM self)             & $(2k+1)/(9k)$  & $4/9$  \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The system (Eq.~\ref{eq:num_sys_N3}) becomes:
+\[
+\frac{1}{j\omega C}
+\begin{bmatrix}
+    2 & 0 & 0 \\
+    \tfrac{2}{3} & \tfrac{10}{3} & -\tfrac{1}{3} \\
+    -\tfrac{2}{9} & -\tfrac{4}{9} & \tfrac{4}{9}
+\end{bmatrix}
+\begin{bmatrix} I_{12} \\ I_{23} \\ I_{\mathrm{CM}} \end{bmatrix}
+=
+\begin{bmatrix} 1\,\mathrm{V} \\ 0 \\ 0 \end{bmatrix}.
+\]
+
+\textbf{Step 1 — Row 1} (same structure as $k = 1$, since row 1 is
+$k$-independent):
+\[
+    I_{12} = \frac{j\omega C}{2}.
+\]
+
+\textbf{Step 2 — substitute $I_{12}$ into Rows 2 and 3}
+(multiply each row by $j\omega C$):
+
+Row~2: $\;\tfrac{2}{3}\cdot\tfrac{j\omega C}{2}
+        + \tfrac{10}{3}\,I_{23}
+        - \tfrac{1}{3}\,I_{\mathrm{CM}} = 0$
+\quad$\Rightarrow$\quad multiply by 3:
+\[
+    j\omega C + 10\,I_{23} - I_{\mathrm{CM}} = 0. \hspace{1.5cm}\text{(A)}
+\]
+
+Row~3: $\;-\tfrac{2}{9}\cdot\tfrac{j\omega C}{2}
+          - \tfrac{4}{9}\,I_{23}
+          + \tfrac{4}{9}\,I_{\mathrm{CM}} = 0$
+\quad$\Rightarrow$\quad multiply by 9:
+\[
+    -j\omega C - 4\,I_{23} + 4\,I_{\mathrm{CM}} = 0. \hspace{1.5cm}\text{(B)}
+\]
+
+\textbf{Step 3 — solve (A) and (B) simultaneously:}
+
+From (B): $I_{\mathrm{CM}} = (j\omega C + 4\,I_{23})/4$.
+Substitute into (A):
+\[
+    j\omega C + 10\,I_{23} - \frac{j\omega C + 4\,I_{23}}{4} = 0
+    \;\;\Rightarrow\;\;
+    \frac{3\,j\omega C}{4} + 9\,I_{23} = 0
+    \;\;\Rightarrow\;\;
+    I_{23} = -\frac{j\omega C}{12}.
+\]
+\[
+    I_{\mathrm{CM}}
+    = \frac{j\omega C + 4(-j\omega C/12)}{4}
+    = \frac{j\omega C\,(1 - 1/3)}{4}
+    = \frac{j\omega C}{6}.
+\]
+
+\begin{eqnbox}[Final Results ($N = 3$, $k = 0.5$, $V_{12} = 1\,\text{V}$,
+              $V_{23} = V_{\mathrm{CM}} = 0$)]
+\[
+    I_{12} = \frac{j\omega C}{2},
+    \qquad
+    I_{23} = -\frac{j\omega C}{12},
+    \qquad
+    I_{\mathrm{CM}} = \frac{j\omega C}{6}.
+\]
+At $C = 1\,\text{nF}$, $f = 1\,\text{MHz}$:\quad
+$|I_{12}| \approx 3.14\,\text{mA}$,\;
+$|I_{23}| \approx 0.52\,\text{mA}$,\;
+$|I_{\mathrm{CM}}| \approx 1.05\,\text{mA}$.
+\end{eqnbox}
+
+\begin{physbox}[Physical Check: Why $I_{\mathrm{CM}} \neq 0$ for $k = 0.5$]
+The excitation $V_{12} = 1\,\text{V}$, $V_{23} = V_{\mathrm{CM}} = 0$
+forces the three line voltages to:
+\[
+    v_{1P} = +\tfrac{2}{3}\,\text{V},\qquad
+    v_{2P} = -\tfrac{1}{3}\,\text{V},\qquad
+    v_{3P} = -\tfrac{1}{3}\,\text{V}.
+\]
+With $v_{Pg} = 0$ the capacitor currents to ground are:
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{cccc}
+\toprule
+Line & Cap & Voltage & Cap current (units of $j\omega C$) \\
+\midrule
+1 & $C$   & $+2/3\,\text{V}$ & $+2/3$ \\
+2 & $C$   & $-1/3\,\text{V}$ & $-1/3$ \\
+3 & $kC$  & $-1/3\,\text{V}$ & $-k/3$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+Total ground current $= j\omega C\!\left(\tfrac{2}{3} - \tfrac{1}{3}
+- \tfrac{k}{3}\right) = j\omega C\cdot\dfrac{1-k}{3}$.
+\begin{itemize}
+    \item $k = 1$: ground current $= 0$.  Perfect cancellation. \checkmark
+    \item $k = 0.5$: ground current $= j\omega C/6$.
+          Matches $I_{\mathrm{CM}} = j\omega C/6$. \checkmark
+\end{itemize}
+Cap 3 draws less current than it would if $k = 1$.  The
+``shortfall'' escapes as $I_{\mathrm{CM}}$ — the conducted EMI
+current a LISN would measure.
+\end{physbox}
+
+\begin{statebox}[Summary: $k = 1$ vs.\ $k = 0.5$ for $N = 3$]
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Current}
+    & $k = 1$ (symmetric)
+    & $k = 0.5$ (asymmetric) \\
+\midrule
+$I_{12}$ (DM pair 1--2)
+    & $j\omega C/2$
+    & $j\omega C/2$ \emph{(unchanged)} \\
+$I_{23}$ (DM pair 2--3)
+    & $0$
+    & $-j\omega C/12$ \emph{(appeared!)} \\
+$I_{\mathrm{CM}}$
+    & $0$
+    & $j\omega C/6$ \emph{(appeared!)} \\
+$|I_{\mathrm{CM}}|$ at $C=1\,\text{nF}$, $1\,\text{MHz}$
+    & $0\,\text{mA}$
+    & $1.05\,\text{mA}$ \\
+Modes coupled?
+    & \textbf{No}
+    & \textbf{Yes} \\
+\bottomrule
+\end{tabular}
+\end{center}
+\textbf{New insight beyond $N = 2$:} asymmetry on a single line
+couples not just DM to CM, but also the two DM pairs to each other.
+$I_{23} \neq 0$ even though $V_{23} = 0$ — the DM(1--2) oscillation,
+filtered through the cap mismatch, induces a DM(2--3) current as a
+side effect.  DM pair (1--2) itself is oblivious (its equation is
+$k$-independent), yet it excites the rest of the system.
+\end{statebox}
+
+\begin{physbox}[The Big Picture]
+The transformation matrices $\TiN$ and $\TvN$ have now done their
+full job.  They converted the messy $N \times N$ mixed-mode
+equation into a structured set where:
+\begin{enumerate}
+    \item $R$ and $L$ contribute only diagonal terms (via $\mathbf{M}$)
+          — they never cause DM--CM coupling.
+    \item The capacitor matrix $\mathbf{S}_N$ is the sole source of
+          coupling, and only through the off-diagonal entries of
+          $\mathbf{S}_{\mathrm{DCM}}$.
+    \item The coupling magnitude is proportional to $(k-1)$:
+          the further the circuit deviates from symmetry, the stronger
+          the DM-to-CM noise injection.
+\end{enumerate}
+The next sections apply this framework to an actual SiC half-bridge
+power module, where specific values of $k$ and the parasitic
+capacitance $\Cp$ allow us to build a concrete CM equivalent circuit.
+\end{physbox}
+
+% \section{The Half-Bridge Testbed and the MCPM}
+% TODO: §3 — MCPM structure, Fig. 2 walk, LISN explanation,
+%            reference A, three-section split (Fig. 3)
+
+% \section{The First CM Equivalent Model}
+% TODO: §4 — LISN CM equiv., asymmetric cap CM eq. (Eq. 19),
+%            reformulation (Eqs. 20-23), Fig. 4 walk, approx. (Eqs. 24-26),
+%            Fig. 5 validation, Tables I-II
+
+% \section{The Alternative CEM: Same Answer, Different Insight}
+% TODO: §5 — two-section split (Fig. 6), alternative CEM (Fig. 7),
+%            leakage vs. recycling comparison
+
