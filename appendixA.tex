@@ -201,22 +201,25 @@ need to resolve because it works entirely at the level of the
 transformed impedance matrix $\mathbf{Z}_{\mathrm{DCM}}$.
 
 \begin{statebox}[Four Strang Connections — Summary]
-\scriptsize
 \centering
-\begin{tabular}{@{}llp{0.85\linewidth}@{}}
+\begin{tabular}{@{}llp{10cm}@{}}
     \toprule
     \textbf{\#} & \textbf{Strang concept} & \textbf{Role here} \\
     \midrule
     A.1 & Change of basis (Ch.~8) &
           $\mathbf{Z}_{\mathrm{DCM}} = \TvN\,\mathbf{Z}\,(\TiN)^{-1}$
           is same circuit, new coordinates \\
+    \addlinespace
     A.2 & Right basis from problem structure (Ch.~3, 6) &
           Rows of $\TiN$, $\TvN$ are instrument measurement rules \\
+    \addlinespace
     A.2 & Fundamental Theorem — null space $\perp$ row space (Ch.~3) &
           DM subspace $\perp$ CM subspace; decomposition is unique \\
+    \addlinespace
     A.3 & Diagonalization (Ch.~6) &
           Symmetric $\Rightarrow$ diagonal $\mathbf{Z}_{\mathrm{DCM}}$;
           asymmetric $\Rightarrow$ off-diagonal = coupling \\
+    \addlinespace
     A.4 & Adjoint / dual spaces (Ch.~6) &
           KVL $\neq$ KCL $\Rightarrow$ $\TvN \neq \TiN$ \\
     \bottomrule
