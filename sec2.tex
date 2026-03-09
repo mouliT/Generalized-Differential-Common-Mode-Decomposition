@@ -91,8 +91,10 @@ cap-to-ground path over the load path.  As a result,
     \quad\Longrightarrow\quad
     i_{C_n} \approx i_n.
 \]
-\textbf{Every voltage drop written in Step 3, and every equation that
-follows, uses this approximation.}
+The paper carries $i_n'$ through the full derivation for generality.
+We do the same: the equations below are written in their exact form.
+Where the EMI approximation $i_n' \approx 0$ simplifies the result,
+it is noted explicitly.
 \end{physbox}
 
 % ---- three voltage drops ----
@@ -112,15 +114,14 @@ Shorthand: define the operator $p \triangleq d/dt$
 $v_L = pL\cdot i_n$.  Every time you see $p$ in front of
 something, read it as ``multiply by $d/dt$''.
 
-\textbf{Capacitor} $C_n$: the capacitor accumulates charge
-$Q = \int i_n\,dt$.  Its terminal voltage is
+\textbf{Capacitor} $C_n$: by KCL (see physbox above), only
+$(i_n - i_n')$ flows through $C_n$.  The capacitor accumulates
+charge $Q = \int (i_n - i_n')\,dt$, so its terminal voltage is
 \[
-    v_{C_n} = \frac{Q}{C_n}
-            = \frac{1}{C_n}\int i_n\,dt
-            = \frac{i_n}{p\,C_n}.
+    v_{C_n} = \frac{i_n - i_n'}{p\,C_n}.
 \]
-The last step uses $1/p \equiv \int dt$ (integration is the
-inverse of differentiation).
+At EMI frequencies $i_n' \approx 0$, so $v_{C_n} \approx i_n/(pC_n)$,
+but we retain the general form.
 
 % ---- KVL ----
 \subsubsection*{Step 4 — Apply KVL}
@@ -130,14 +131,13 @@ The driving voltage equals the sum of the three drops:
     v_{nP} + v_{Pg}
     = \underbrace{R\,i_n}_{v_R}
     + \underbrace{pL\cdot i_n}_{v_L}
-    + \underbrace{\dfrac{i_n}{p\,C_n}}_{v_{C_n}}.
+    + \underbrace{\dfrac{i_n - i_n'}{p\,C_n}}_{v_{C_n}}.
 \]
-Factor out $i_n$:
 
-\begin{eqnbox}[Per-Line KVL — One Equation for Line $n$]
+\begin{eqnbox}[Per-Line KVL — One Equation for Line $n$ (Eq.~9 in paper)]
 \begin{equation}
     v_{nP} + v_{Pg}
-    = \Bigl(R + pL + \frac{1}{p\,C_n}\Bigr)\,i_n
+    = (R + pL)\,i_n + \frac{i_n - i_n'}{p\,C_n}
     \label{eq:KVL_one}
 \end{equation}
 \end{eqnbox}
@@ -156,7 +156,7 @@ Then $\dfrac{1}{pC_n} = \dfrac{S_n}{p}$, and
 Eq.~\eqref{eq:KVL_one} becomes:
 \[
     v_{nP} + v_{Pg}
-    = \Bigl(R + pL + \frac{S_n}{p}\Bigr)\,i_n.
+    = (R + pL)\,i_n + \frac{S_n}{p}\,(i_n - i_n').
 \]
 
 \begin{physbox}[Why Bother Naming $1/C_n$ as $S_n$?]
@@ -217,7 +217,10 @@ vectors:
     \qquad
     \mathbf{v}_{nP} = \begin{bmatrix} v_{1P} \\ \vdots \\ v_{NP} \end{bmatrix},
     \qquad
-    \mathbf{1}_N = \begin{bmatrix} 1 \\ \vdots \\ 1 \end{bmatrix}.
+    \mathbf{1}_N = \begin{bmatrix} 1 \\ \vdots \\ 1 \end{bmatrix},
+    \qquad
+    \mathbf{i}' = \begin{bmatrix} i_1' \\ \vdots \\ i_N' \end{bmatrix}
+    \quad\text{(load current vector)}.
 \]
 
 The shared term $v_{Pg}$ multiplies the all-ones vector
@@ -232,15 +235,13 @@ of elastances.  Putting it all together:
 
 \begin{eqnbox}[Mixed-Mode Circuit Equations — Eq.~9 in paper]
 \begin{equation}
-    \mathbf{Z}\,\mathbf{i}
+    (R + pL)\,\mathbf{i}
+    + \frac{1}{p}\,\mathbf{S}_N\,(\mathbf{i} - \mathbf{i}')
     = \mathbf{v}_{nP} + v_{Pg}\,\mathbf{1}_N
     \label{eq:MMeqn}
 \end{equation}
 where
 \[
-    \mathbf{Z}
-    = (R + pL)\,\mathbf{I}_N + \frac{1}{p}\,\mathbf{S}_N,
-    \qquad
     \mathbf{S}_N
     = \operatorname{diag}\!\Bigl(
         \underbrace{\tfrac{1}{C},\;\ldots,\;\tfrac{1}{C}}_{N-1},\;
@@ -259,12 +260,15 @@ transform in \S1.6).  This equation is written in those
 together inside every $i_n$ and $v_{nP}$.  The next subsection
 applies the transformation to separate them.
 
-\begin{statebox}[Two Observations About $\mathbf{Z}$]
+\begin{statebox}[Two Observations About the Circuit Equation]
 \begin{itemize}
-    \item \textbf{$(R + pL)\,\mathbf{I}_N$ is a scaled identity.}
-          Every line has the same $R$ and $L$, so this block is
-          perfectly symmetric.  It will transform very cleanly in
-          the next section.
+    \item \textbf{$(R+pL)\mathbf{I}_N$ and the cap term $(1/p)\mathbf{S}_N$ are separate.}
+          The $R$--$L$ term multiplies $\mathbf{i}$ alone; the cap term acts on
+          $(\mathbf{i} - \mathbf{i}')$.  Equivalently, defining
+          $\mathbf{Z} = (R+pL)\mathbf{I}_N + (1/p)\mathbf{S}_N$, the equation reads
+          $\mathbf{Z}\mathbf{i} = \mathbf{v}_{nP} + v_{Pg}\mathbf{1}_N
+          + (1/p)\mathbf{S}_N\,\mathbf{i}'$ — same $\mathbf{Z}$, with an extra
+          $\mathbf{i}'$ source term.
     \item \textbf{$\mathbf{S}_N$ is diagonal but not symmetric}
           when $k \neq 1$.  All entries equal $1/C$ except the
           last, which is $1/(kC)$.  This is the \textbf{only}
@@ -300,24 +304,33 @@ if it is asymmetric, off-diagonal entries appear — and those
 \emph{are} the DM--CM coupling, now directly readable.
 \end{physbox}
 
-Multiply Eq.~\eqref{eq:MMeqn} on the left by $\TvN$, then
-substitute $\mathbf{i} = (\TiN)^{-1}\iDCM$:
+Multiply Eq.~\eqref{eq:MMeqn} on the left by $\TvN$, substitute
+$\mathbf{i} = (\TiN)^{-1}\iDCM$ and
+$\mathbf{i}' = (\TiN)^{-1}\mathbf{i}'_{\mathrm{DCM}}$:
 \[
     \underbrace{\TvN\,\mathbf{Z}\,(\TiN)^{-1}}_{\mathbf{Z}_{\mathrm{DCM}}}
     \;\iDCM
     \;=\;
     \vDCM
-    \;+\; v_{Pg}\,\underbrace{\TvN\,\mathbf{1}_N}_{\mathbf{e}_N}.
+    \;+\; v_{Pg}\,\mathbf{e}_N
+    \;+\; \frac{1}{p}\,\underbrace{\TvN\,\mathbf{S}_N\,(\TiN)^{-1}}
+                                   _{\mathbf{S}_{\mathrm{DCM}}}
+    \,\mathbf{i}'_{\mathrm{DCM}}.
 \]
 
 \begin{eqnbox}[DCM Equations — Eq.~10 in paper]
 \begin{equation}
     \mathbf{Z}_{\mathrm{DCM}}\,\iDCM
     = \vDCM + v_{Pg}\,\mathbf{e}_N
+    + \frac{1}{p}\,\mathbf{S}_{\mathrm{DCM}}\,\mathbf{i}'_{\mathrm{DCM}}
     \label{eq:DCMeqn}
 \end{equation}
-where $\mathbf{Z}_{\mathrm{DCM}} = \TvN\,\mathbf{Z}\,(\TiN)^{-1}$
-and $\mathbf{e}_N = [0,\ldots,0,1]^T$ is the $N$-th unit vector.
+where $\mathbf{Z}_{\mathrm{DCM}} = \TvN\,\mathbf{Z}\,(\TiN)^{-1}$,\;
+$\mathbf{S}_{\mathrm{DCM}} = \TvN\,\mathbf{S}_N\,(\TiN)^{-1}$,\;
+and $\mathbf{e}_N = [0,\ldots,0,1]^T$.\\[4pt]
+\textit{EMI approximation:} when $i_n' \approx 0$, the last term
+vanishes and the equation reduces to
+$\mathbf{Z}_{\mathrm{DCM}}\,\iDCM = \vDCM + v_{Pg}\,\mathbf{e}_N$.
 \end{eqnbox}
 
 % ------------------------------------------------------------
