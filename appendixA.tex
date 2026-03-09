@@ -69,56 +69,75 @@ Why exactly $\TvN \neq \TiN$ is the subject of \S A.4.
   \begin{scope}
     \draw[->] (-0.3,0) -- (4.2,0) node[right] {$i_1$\,(A)};
     \draw[->] (0,-0.3) -- (0,2.6) node[above] {$i_2$\,(A)};
+
+    % ticks
     \foreach \x in {1,2,3}
-      \draw (\x,3pt)--(\x,-3pt) node[below,font=\scriptsize] {\x};
+      \draw (\x,2pt)--(\x,-2pt) node[below,font=\scriptsize] {\x};
     \foreach \y in {1,2}
-      \draw (3pt,\y)--(-3pt,\y) node[left,font=\scriptsize] {\y};
+      \draw (2pt,\y)--(-2pt,\y) node[left,font=\scriptsize] {\y};
+
     % Current vector
     \draw[->, very thick, red!80!black] (0,0) -- (3,1)
-      node[above right] {$\mathbf{i}$};
+      node[pos=0.9, above right] {$\mathbf{i}$};
+
     % Projection dashes
-    \draw[dashed,gray!70] (3,0)--(3,1)--(0,1);
+    \draw[dashed,gray!50] (3,0)--(3,1)--(0,1);
+
     % Coordinate annotation
-    \node[blue!70!black, font=\scriptsize\bfseries] at (1.5,-0.8)
+    \node[blue!60!black, font=\scriptsize\bfseries] at (1.5,-0.9)
       {per-line: $(i_1,\,i_2)=(3,\,1)$};
-    \node[font=\bfseries\small, emidark] at (1.8, 2.8)
+
+    % Panel title
+    \node[font=\bfseries\small] at (1.8,3.2)
       {Original basis};
   \end{scope}
 
   %=== Arrow between panels ===
   \draw[->, very thick, blue!70!black]
-    (4.5,1.2) -- (6.0,1.2)
-    node[midway,above,font=\scriptsize] {$\TiN$}
-    node[midway,below,font=\scriptsize\itshape] {change basis};
+    (4.5,1.5) -- (6.0,1.5)
+    node[midway,above=3pt,font=\scriptsize] {$\TiN$}
+    node[midway,below=3pt,font=\scriptsize\itshape] {change basis};
 
   %=== Right panel: DM-CM coordinate system ===
   \begin{scope}[shift={(6.5,0)}]
+
     \draw[->] (-0.3,0) -- (2.5,0) node[right] {$i_{\mathrm{DM}}$\,(A)};
     \draw[->] (0,-0.3) -- (0,4.8) node[above] {$i_{\mathrm{CM}}$\,(A)};
+
+    % ticks
     \foreach \x in {1,2}
-      \draw (\x,3pt)--(\x,-3pt) node[below,font=\scriptsize] {\x};
+      \draw (\x,2pt)--(\x,-2pt) node[below,font=\scriptsize] {\x};
     \foreach \y in {1,2,3,4}
-      \draw (3pt,\y)--(-3pt,\y) node[left,font=\scriptsize] {\y};
+      \draw (2pt,\y)--(-2pt,\y) node[left,font=\scriptsize] {\y};
+
     % Same physical current, new coordinates
     \draw[->, very thick, red!80!black] (0,0) -- (1,4)
-      node[right] {$\mathbf{i}$};
+      node[pos=0.92, right] {$\mathbf{i}$};
+
     % Projection dashes
-    \draw[dashed,gray!70] (1,0)--(1,4)--(0,4);
+    \draw[dashed,gray!50] (1,0)--(1,4)--(0,4);
+
     % Coordinate annotation
-    \node[blue!70!black, font=\scriptsize\bfseries] at (0.8,-0.8)
+    \node[blue!60!black, font=\scriptsize\bfseries] at (0.9,-0.9)
       {DM-CM: $(i_{\mathrm{DM}},\,i_{\mathrm{CM}})=(1,\,4)$};
-    \node[font=\bfseries\small, emidark] at (0.8, 5.2)
+
+    % Panel title
+    \node[font=\bfseries\small] at (0.9,5.5)
       {New basis};
+
   \end{scope}
 
 \end{tikzpicture}
+
 \caption{The same physical current state — line~1 carries $3\,\mathrm{A}$,
 line~2 carries $1\,\mathrm{A}$ — expressed in two coordinate systems.
-Left: per-line basis, coordinates $(3,\,1)$.
-Right: DM-CM basis, $i_{\mathrm{DM}}=(3-1)/2=1\,\mathrm{A}$
-and $i_{\mathrm{CM}}=3+1=4\,\mathrm{A}$.
-The red arrow is the same physical current; only the numbers change.}
+Left: per-line basis with coordinates $(3,\,1)$.
+Right: DM-CM basis, where $i_{\mathrm{DM}}=(3-1)/2=1\,\mathrm{A}$ and
+$i_{\mathrm{CM}}=3+1=4\,\mathrm{A}$.
+The red arrow represents the same physical current vector; only its coordinates change.}
+
 \label{fig:appA_basis_change}
+
 \end{figure}
 % -------------------------------------------------------------------
 

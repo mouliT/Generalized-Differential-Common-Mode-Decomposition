@@ -16,294 +16,406 @@ system. When we change basis, we are not moving the vector; we are only
 changing how we describe it numerically.
 
 \begin{center}
-%\vspace{2mm}
 \textit{The arrow stays fixed. Only the numbers change.}
-%\vspace{2mm}
 \end{center}
 
 Consider $\mathbb{R}^2$:
+
 \begin{itemize}
-    \item Standard basis: $e_1 = \begin{bmatrix} 1 \\ 0 \end{bmatrix}$,
-                         $e_2 = \begin{bmatrix} 0 \\ 1 \end{bmatrix}$
-    \item New basis:     $e'_1 = \begin{bmatrix} 1 \\ 1 \end{bmatrix}$,
-                        $e'_2 = \begin{bmatrix} -1 \\ 1 \end{bmatrix}$
+    \item Standard basis:
+    $
+        e_1 =
+        \begin{bmatrix}
+        1\\0
+        \end{bmatrix},
+        \;
+        e_2 =
+        \begin{bmatrix}
+        0\\1
+        \end{bmatrix}
+    $
+
+    \item New basis:
+    $
+        e'_1 =
+        \begin{bmatrix}
+        1\\1
+        \end{bmatrix},
+        \;
+        e'_2 =
+        \begin{bmatrix}
+        -1\\1
+        \end{bmatrix}
+    $
 \end{itemize}
 
-A vector $\mathbf{x}$ pointing in some direction can be written as:
+A vector $\mathbf{x}$ pointing in some direction can be written as
+
 \[
-    \mathbf{x} = 3e_1 + 2e_2 \quad\text{or}\quad
-    \mathbf{x} = 2.5e'_1 + 0.5e'_2
+\mathbf{x} = 3e_1 + 2e_2
 \]
 
-The arrow is identical. The coordinates $(3,2)$ vs $(2.5, 0.5)$
-describe the same geometric object in different languages.
+or equivalently
+
+\[
+\mathbf{x} = 2.5e'_1 - 0.5e'_2
+\]
+
+The arrow is identical. The coordinates $(3,2)$ and $(2.5,-0.5)$
+describe the same geometric object in different coordinate systems.
 
 % ---- B.2 ----
 \subsection{Change of Basis Matrix}
 \label{sec:change-of-basis}
 
-Let $v = \{e_1, e_2, \ldots, e_n\}$ be the old basis and $v' = \{e'_1,
-e'_2, \ldots, e'_n\}$ be the new basis. The change-of-basis matrix
-$M_{v' \to v}$ converts coordinates in the new basis to coordinates in
-the old basis:
+Let $v = \{e_1, e_2, \ldots, e_n\}$ be the old basis and
+$v' = \{e'_1, e'_2, \ldots, e'_n\}$ be the new basis.
+
+The change-of-basis matrix
+$
+M_{v' \to v}
+$
+converts coordinates expressed in the new basis to coordinates in the
+old basis:
 
 \[
-    \mathbf{x}_v = M_{v' \to v}\,\mathbf{x}_{v'}
+\mathbf{x}_v = M_{v' \to v}\mathbf{x}_{v'}
 \]
 
-\textbf{How to build $M$:} Each column $j$ of $M$ contains the
-coordinates of the new basis vector $e'_j$ written in the old basis $v$.
+For convenience, define
 
-\textbf{Example:} In $\mathbb{R}^2$ with $e'_1 = \begin{bmatrix} 1 \\ 1 \end{bmatrix}$
-and $e'_2 = \begin{bmatrix} -1 \\ 1 \end{bmatrix}$ (expressed in standard basis):
 \[
-    M_{v' \to v} = \begin{bmatrix} 1 & -1 \\ 1 & 1 \end{bmatrix}
+M \equiv M_{v' \to v}.
 \]
 
-To go the other direction (old to new), use the inverse:
+\textbf{How to build $M$:}
+
+Each column $j$ of $M$ contains the coordinates of the new basis vector
+$e'_j$ written in the old basis.
+
+\textbf{Example:}
+
+In $\mathbb{R}^2$ with
+
 \[
-    \mathbf{x}_{v'} = M_{v' \to v}^{-1}\,\mathbf{x}_v
+e'_1 =
+\begin{bmatrix}
+1\\1
+\end{bmatrix},
+\quad
+e'_2 =
+\begin{bmatrix}
+-1\\1
+\end{bmatrix}
+\]
+
+(expressed in the standard basis)
+
+\[
+M =
+\begin{bmatrix}
+1 & -1 \\
+1 & 1
+\end{bmatrix}
+\]
+
+To convert coordinates in the opposite direction,
+
+\[
+\mathbf{x}_{v'} = M^{-1}\mathbf{x}_v.
 \]
 
 % ---- B.3 ----
 \subsection{Linear Transformation as a Physical Action}
 \label{sec:linear-transformation}
 
-Now consider a linear transformation $T$ — a physical operation like
-rotation, scaling, or projection. Crucially, $T$ itself does not depend
-on any basis; it is the same action regardless of how we choose to
-describe vectors.
+Now consider a linear transformation $T$ — a physical operation such as
+rotation, scaling, or projection. The transformation itself does not
+depend on any basis; it represents the same physical action regardless
+of how we choose to describe vectors.
 
-When we represent $T$ as a matrix, we are simply writing down the same
-physical action in a particular coordinate language.
+When we represent $T$ as a matrix, we are simply expressing the same
+operation in a particular coordinate system.
 
-\textbf{How to find the matrix $[T]_v$ of transformation $T$ in basis $v$:}
-Apply $T$ to each basis vector, then write the result in terms of the
-same basis. These results become the columns of the matrix.
+\textbf{How to compute the matrix $[T]_v$:}
 
-Specifically:
+Apply $T$ to each basis vector and express the result in the same basis.
+
 \begin{itemize}
-    \item Column 1 of $[T]_v$: coordinates of $T(e_1)$ in basis $v$
-    \item Column 2 of $[T]_v$: coordinates of $T(e_2)$ in basis $v$
-    \item And so on...
+\item Column 1 of $[T]_v$ = coordinates of $T(e_1)$ in basis $v$
+\item Column 2 of $[T]_v$ = coordinates of $T(e_2)$ in basis $v$
+\item etc.
 \end{itemize}
 
-\textbf{Example:} In $\mathbb{R}^2$, let $T$ be a $90^\circ$ rotation
-counterclockwise. In the standard basis:
+\textbf{Example:}
+
+Let $T$ be a $90^\circ$ counter-clockwise rotation.
+
 \[
-    T(e_1) = T\!\begin{bmatrix} 1 \\ 0 \end{bmatrix}
-           = \begin{bmatrix} 0 \\ 1 \end{bmatrix}
-    \quad\Rightarrow\quad
-    \text{column 1 } = \begin{bmatrix} 0 \\ 1 \end{bmatrix}
-\]
-\[
-    T(e_2) = T\!\begin{bmatrix} 0 \\ 1 \end{bmatrix}
-           = \begin{bmatrix} -1 \\ 0 \end{bmatrix}
-    \quad\Rightarrow\quad
-    \text{column 2 } = \begin{bmatrix} -1 \\ 0 \end{bmatrix}
-\]
-\[
-    [T]_v = \begin{bmatrix} 0 & -1 \\ 1 & 0 \end{bmatrix}
+T(e_1) =
+T
+\begin{bmatrix}
+1\\0
+\end{bmatrix}
+=
+\begin{bmatrix}
+0\\1
+\end{bmatrix}
 \]
 
-The matrix is different in a different basis, but the physical rotation
-is the same.
+\[
+T(e_2) =
+T
+\begin{bmatrix}
+0\\1
+\end{bmatrix}
+=
+\begin{bmatrix}
+-1\\0
+\end{bmatrix}
+\]
+
+Thus
+
+\[
+[T]_v =
+\begin{bmatrix}
+0 & -1 \\
+1 & 0
+\end{bmatrix}.
+\]
+
+The matrix representation changes when the basis changes, but the
+underlying transformation remains the same.
 
 % ---- B.4 ----
 \subsection{Deriving $B = M^{-1}AM$ Geometrically}
 \label{sec:derive-similarity}
 
-Now we arrive at the key question: given a linear transformation $T$
-represented by matrix $A$ in basis $v$, what is its matrix $B$ in a new
-basis $v'$?
-
-Here's the geometric derivation:
+Suppose a transformation $T$ is represented by matrix $A$ in basis $v$.
+We want the matrix $B$ that represents the same transformation in the
+new basis $v'$.
 
 \begin{enumerate}
-    \item \textbf{Start with a vector in new basis:}
-          $\mathbf{x}_{v'}$ is the input (coordinates in $v'$).
 
-    \item \textbf{Convert to old basis (where we know $A$):}
-          $\mathbf{x}_v = M_{v' \to v}\,\mathbf{x}_{v'}$
+\item Start with coordinates in the new basis:
 
-    \item \textbf{Apply the transformation (in old basis):}
-          $\mathbf{y}_v = A\,\mathbf{x}_v = A M_{v' \to v}\,\mathbf{x}_{v'}$
+\[
+\mathbf{x}_{v'}
+\]
 
-    \item \textbf{Convert result back to new basis:}
-          $\mathbf{y}_{v'} = M_{v' \to v}^{-1}\,\mathbf{y}_v
-                           = M_{v' \to v}^{-1} A M_{v' \to v}\,\mathbf{x}_{v'}$
+\item Convert to the old basis:
+
+\[
+\mathbf{x}_v = M\mathbf{x}_{v'}
+\]
+
+\item Apply the transformation:
+
+\[
+\mathbf{y}_v = A\mathbf{x}_v = AM\mathbf{x}_{v'}
+\]
+
+\item Convert the result back to the new basis:
+
+\[
+\mathbf{y}_{v'} = M^{-1}\mathbf{y}_v
+                 = M^{-1}AM\mathbf{x}_{v'}
+\]
+
 \end{enumerate}
 
-But by definition, $\mathbf{y}_{v'} = B\,\mathbf{x}_{v'}$ (this is what
-we're looking for). Therefore:
+But by definition,
 
 \[
-    \boxed{\,B = M^{-1} A M\,}
+\mathbf{y}_{v'} = B\mathbf{x}_{v'}.
 \]
 
-This is the \textbf{similarity transformation}. The same $M$ appears on
-both sides because we are transforming within a single vector space —
-the domain and codomain are the same space, so they use the same basis
-change.
+Therefore
+
+\[
+\boxed{B = M^{-1}AM}
+\]
+
+This is the similarity transformation. The same matrix $M$ appears on
+both sides because the domain and codomain are the same vector space.
 
 % ---- B.5 ----
-\subsection{Same Space vs. Different Spaces: The Key Distinction}
+\subsection{Same Space vs. Different Physical Quantities}
 \label{sec:same-vs-different}
 
-The derivation above assumed \textbf{domain = codomain}. This is why the
-same matrix $M$ appears twice:
+The derivation above assumes the transformation maps a space to itself:
+
 \[
-    \underbrace{\mathbf{y}}_{\text{same space}} = A\underbrace{\mathbf{x}}_{\text{same space}}
+\mathbf{y} = A\mathbf{x}
 \]
 
+Both $\mathbf{x}$ and $\mathbf{y}$ belong to the same coordinate space.
+
 \bigskip
-\noindent\textbf{What happens when domain $\neq$ codomain?}
 
-Consider the impedance matrix $Z$: it maps \textbf{currents} (one space)
-to \textbf{voltages} (a different space). These are fundamentally
-different physical quantities, governed by different laws:
-\begin{itemize}
-    \item Currents obey KCL (sum at a node)
-    \item Voltages obey KVL (sum around a loop)
-\end{itemize}
+In contrast, the impedance matrix relates two different physical
+quantities:
 
-When we change basis, we must transform each space independently:
-\begin{itemize}
-    \item $T^i$: transforms current coordinates (from per-line to DM--CM)
-    \item $T^v$: transforms voltage coordinates (from per-line to DM--CM)
-\end{itemize}
-
-The transformation becomes:
 \[
-    Z_{\text{new}} = (T^v)^{-1} \, Z \, (T^i)^{-1}
+\mathbf{v} = Z\mathbf{i}
 \]
 
-\bigskip
-\noindent\textbf{Why this is not similarity transformation:}
+Currents and voltages are both vectors in $\mathbb{R}^n$, but they
+represent different physical variables governed by different laws:
 
 \begin{itemize}
-    \item Similarity: $A_{\text{new}} = P^{-1}AP$ — same $P$ on both sides
-    \item Circuit:   $Z_{\text{new}} = T^v Z(T^i)^{-1}$ — different matrices!
+\item Currents obey KCL (current conservation)
+\item Voltages obey KVL (loop voltage relations)
 \end{itemize}
 
-The circuit uses \textbf{two different} transformations because the
-domain (currents) and codomain (voltages) are different vector spaces.
+When changing coordinates, each quantity must be transformed using its
+own transformation matrix:
+
+\begin{itemize}
+\item $T^i$ transforms current coordinates
+\item $T^v$ transforms voltage coordinates
+\end{itemize}
+
+The impedance matrix therefore transforms as
+
+\[
+Z_{\text{new}} = T^v Z (T^i)^{-1}
+\]
+
+\textbf{Why this is not a similarity transformation}
+
+\begin{itemize}
+\item Similarity: $A_{\text{new}} = P^{-1}AP$
+\item Circuit: $Z_{\text{new}} = T^v Z (T^i)^{-1}$
+\end{itemize}
+
+Two different matrices appear because the input and output variables
+represent different physical quantities.
 
 % ---- B.6 ----
-\subsection{Numerical Example: Similarity Transformation ($A: V \to V$)}
+\subsection{Numerical Example: Similarity Transformation}
 \label{sec:numerical-similarity}
 
-For a linear map within a single space, use the same $P$ on both sides.
-
-\bigskip
-\noindent\textbf{Setup:} $V = \mathbb{R}^2$, standard basis.
 \[
-    A = \begin{bmatrix} 3 & 1 \\ 0 & 2 \end{bmatrix}, \qquad
-    P = \begin{bmatrix} 1 & 1 \\ 0 & 1 \end{bmatrix}, \qquad
-    P^{-1} = \begin{bmatrix} 1 & -1 \\ 0 & 1 \end{bmatrix}.
+A =
+\begin{bmatrix}
+3 & 1\\
+0 & 2
+\end{bmatrix},
+\qquad
+P =
+\begin{bmatrix}
+1 & 1\\
+0 & 1
+\end{bmatrix},
+\qquad
+P^{-1} =
+\begin{bmatrix}
+1 & -1\\
+0 & 1
+\end{bmatrix}
 \]
 
-\noindent\textbf{Similarity transform (same $P$ on both sides):}
 \[
-    A_{\text{new}} = P^{-1} A P
-    = \begin{bmatrix} 1 & -1 \\ 0 & 1 \end{bmatrix}
-      \begin{bmatrix} 3 & 1 \\ 0 & 2 \end{bmatrix}
-      \begin{bmatrix} 1 & 1 \\ 0 & 1 \end{bmatrix}
-    = \begin{bmatrix} 3 & 2 \\ 0 & 2 \end{bmatrix}.
+A_{\text{new}}
+=
+P^{-1}AP
+=
+\begin{bmatrix}
+3 & 2\\
+0 & 2
+\end{bmatrix}
 \]
 
-\noindent\textbf{Key point:} Same $P$ on both sides because domain and
-codomain are the same space $\mathbb{R}^2$.
+The same matrix $P$ appears on both sides because the transformation
+acts within a single vector space.
 
 % ---- B.7 ----
-\subsection{Numerical Example: Circuit Transformation ($Z: V_i \to V_v$)}
+\subsection{Numerical Example: Circuit Transformation}
 \label{sec:numerical-circuit}
 
-For impedance, domain $\neq$ codomain, so we need two different matrices.
-We use $N = 2$ lines with the paper's actual definitions.
-
-\bigskip
-\noindent\textbf{Setup:}
-\begin{itemize}
-    \item Impedance matrix (line 1: $2\,\Omega$, line 2: $6\,\Omega$, asymmetric):
-        \[
-            Z = \begin{bmatrix} 2 & 0 \\ 0 & 6 \end{bmatrix}\ \Omega
-        \]
-    \item Current transformation $T^i$ (KCL: half-differences and sum):
-        \[
-            T^i = \begin{bmatrix} \tfrac{1}{2} & -\tfrac{1}{2} \\[4pt] 1 & 1 \end{bmatrix},
-            \qquad
-            (T^i)^{-1} = \begin{bmatrix} 1 & \tfrac{1}{2} \\[4pt] -1 & \tfrac{1}{2} \end{bmatrix}
-        \]
-    \item Voltage transformation $T^v$ (KVL: full difference and average):
-        \[
-            T^v = \begin{bmatrix} 1 & -1 \\[4pt] \tfrac{1}{2} & \tfrac{1}{2} \end{bmatrix}
-        \]
-\end{itemize}
-
-\bigskip
-\noindent\textbf{Step 1 — compute $Z\,(T^i)^{-1}$:}
 \[
-    Z\,(T^i)^{-1}
-    = \begin{bmatrix} 2 & 0 \\ 0 & 6 \end{bmatrix}
-      \begin{bmatrix} 1 & \tfrac{1}{2} \\ -1 & \tfrac{1}{2} \end{bmatrix}
-    = \begin{bmatrix} 2 & 1 \\ -6 & 3 \end{bmatrix}
+Z =
+\begin{bmatrix}
+2 & 0\\
+0 & 6
+\end{bmatrix}
 \]
 
-\bigskip
-\noindent\textbf{Step 2 — apply $T^v$ on the left:}
 \[
-    Z_{\text{DCM}} = T^v \, Z \, (T^i)^{-1}
-    = \begin{bmatrix} 1 & -1 \\ \tfrac{1}{2} & \tfrac{1}{2} \end{bmatrix}
-      \begin{bmatrix} 2 & 1 \\ -6 & 3 \end{bmatrix}
-    = \begin{bmatrix} 8 & -2 \\ -2 & 2 \end{bmatrix}\ \Omega
+T^i =
+\begin{bmatrix}
+\frac12 & -\frac12\\
+1 & 1
+\end{bmatrix},
+\qquad
+(T^i)^{-1} =
+\begin{bmatrix}
+1 & \frac12\\
+-1 & \frac12
+\end{bmatrix}
 \]
 
-\noindent\textbf{Reading the result:}
-\begin{itemize}
-    \item Diagonal entries: DM impedance $= 8\,\Omega$, CM impedance $= 2\,\Omega$.
-    \item Off-diagonal entry $-2\,\Omega \neq 0$ — DM and CM are coupled because
-          $Z_1 \neq Z_2$ (asymmetric circuit).
-\end{itemize}
-
-\bigskip
-\noindent\textbf{Sanity check — symmetric case ($Z_1 = Z_2 = 2\,\Omega$):}
 \[
-    Z_{\text{DCM}}^{\text{sym}}
-    = \begin{bmatrix} 1 & -1 \\ \tfrac{1}{2} & \tfrac{1}{2} \end{bmatrix}
-      \begin{bmatrix} 2 & 0 \\ 0 & 2 \end{bmatrix}
-      \begin{bmatrix} 1 & \tfrac{1}{2} \\ -1 & \tfrac{1}{2} \end{bmatrix}
-    = \begin{bmatrix} 4 & 0 \\ 0 & 1 \end{bmatrix}\ \Omega \quad \checkmark
+T^v =
+\begin{bmatrix}
+1 & -1\\
+\frac12 & \frac12
+\end{bmatrix}
 \]
-Diagonal — no coupling when the circuit is symmetric.
 
-\noindent\textbf{Key point:} Different matrices $T^i$ and $T^v$ because
-currents and voltages live in different physical spaces (KCL vs.\ KVL).
+\[
+Z_{\text{DCM}}
+=
+T^v Z (T^i)^{-1}
+=
+\begin{bmatrix}
+8 & -2\\
+-2 & 2
+\end{bmatrix}
+\]
+
+The off-diagonal entries indicate coupling between differential and
+common modes due to circuit asymmetry.
+
+For a symmetric case ($Z_1 = Z_2$)
+
+\[
+Z_{\text{DCM}} =
+\begin{bmatrix}
+4 & 0\\
+0 & 1
+\end{bmatrix}
+\]
+
+which is diagonal (no DM–CM coupling).
 
 % ---- B.8 ----
 \subsection{Summary}
 \label{sec:summary}
 
 \begin{table}[h!]
-    \centering
-    \begin{tabular}{|l|c|c|}
-        \hline
-        & Similarity Transform & Circuit Transform \\
-        \hline
-        \textbf{Map type} & $A: V \to V$ & $Z: V_i \to V_v$ \\
-        \hline
-        \textbf{Spaces} & Domain = Codomain & Domain $\neq$ Codomain \\
-        \hline
-        \textbf{Matrices} & Same $P$ on both sides & $T^i$ for currents, $T^v$ for voltages \\
-        \hline
-        \textbf{Formula} & $A_{\text{new}} = P^{-1}AP$ & $Z_{\text{new}} = T^v Z(T^i)^{-1}$ \\
-        \hline
-        \textbf{Physical meaning} & Same transformation, new basis & Different physical quantities \\
-        \hline
-    \end{tabular}
+\centering
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{|p{3cm}|p{5.5cm}|p{5.5cm}|}
+\hline
+\textbf{Aspect} & \textbf{Similarity Transform} & \textbf{Circuit Transform} \\
+\hline
+\textbf{Map type} & $A : V \to V$ & $Z : i \to v$ \\
+\hline
+\textbf{Spaces} & Same coordinate space & Different physical variables \\
+\hline
+\textbf{Matrices} & Same $P$ on both sides & $T^i,\;T^v$ \\
+\hline
+\textbf{Formula} & $A_{\text{new}} = P^{-1}AP$ & $Z_{\text{new}} = T^v Z (T^i)^{-1}$ \\
+\hline
+\textbf{Physical meaning} & Same transformation expressed in new coordinates & Change of current/voltage coordinate representation \\
+\hline
+\end{tabular}
 \end{table}
 
-The geometric interpretation clarifies why: similarity transformation
-keeps the same vector space (just re-coordinates it), while the circuit
-transformation bridges two different physical spaces (currents to
-voltages), requiring two independent basis changes.
+The geometric interpretation clarifies the difference: similarity
+transformation simply re-expresses a transformation in another basis,
+while the circuit transformation changes the coordinate descriptions of
+two different physical variables.
