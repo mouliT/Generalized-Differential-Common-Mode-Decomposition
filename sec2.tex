@@ -320,3 +320,78 @@ where $\mathbf{Z}_{\mathrm{DCM}} = \TvN\,\mathbf{Z}\,(\TiN)^{-1}$
 and $\mathbf{e}_N = [0,\ldots,0,1]^T$ is the $N$-th unit vector.
 \end{eqnbox}
 
+% ------------------------------------------------------------
+\subsubsection*{Expanding $\mathbf{Z}_{\mathrm{DCM}}$ — Eqs.~11--13 in paper}
+% ------------------------------------------------------------
+
+The impedance matrix $\mathbf{Z}$ has two parts: the resistive/inductive
+part $(R + pL)\,\mathbf{I}_N$ (the same on every line) and the capacitive
+part $(1/p)\,\mathbf{S}_N$ (which carries the $k \neq 1$ asymmetry).
+Substituting $\mathbf{Z} = (R + pL)\,\mathbf{I}_N + (1/p)\,\mathbf{S}_N$
+into $\mathbf{Z}_{\mathrm{DCM}} = \TvN\,\mathbf{Z}\,(\TiN)^{-1}$ and
+using linearity of matrix multiplication:
+
+\begin{eqnbox}[Expanded DCM Impedance — Eq.~11 in paper]
+\begin{equation}
+    \mathbf{Z}_{\mathrm{DCM}}
+    = (R + pL)\,\underbrace{\TvN\,(\TiN)^{-1}}_{\displaystyle\mathbf{M}}
+    \;+\; \frac{1}{p}\,\underbrace{\TvN\,\mathbf{S}_N\,(\TiN)^{-1}}
+                                   {\displaystyle\mathbf{S}_{\mathrm{DCM}}}
+    \label{eq:Zdcm_expanded}
+\end{equation}
+Two new matrices appear: $\mathbf{M}$ (carries $R$ and $L$) and
+$\mathbf{S}_{\mathrm{DCM}}$ (carries the capacitors, including the asymmetry
+$k$).  Their definitions are Eqs.~12--13 of the paper.
+\end{eqnbox}
+
+\begin{eqnbox}[$\mathbf{M}$ and $\mathbf{S}_{\mathrm{DCM}}$ — Eqs.~12--13 in paper]
+\begin{align}
+    \mathbf{M}
+        &= \TvN\,(\TiN)^{-1}
+        \label{eq:Mdef} \\[6pt]
+    \mathbf{S}_{\mathrm{DCM}}
+        &= \TvN\,\mathbf{S}_N\,(\TiN)^{-1}
+        \label{eq:Sdcm_def}
+\end{align}
+\end{eqnbox}
+
+\paragraph{$\mathbf{M}$ is always diagonal — $R$ and $L$ never couple DM to CM.}
+
+For $N = 2$, compute directly:
+\[
+    \mathbf{M}
+    = \begin{bmatrix}1 & -1 \\[3pt] \tfrac{1}{2} & \tfrac{1}{2}\end{bmatrix}
+      \begin{bmatrix}1 & \tfrac{1}{2} \\[3pt] -1 & \tfrac{1}{2}\end{bmatrix}
+    = \begin{bmatrix}2 & 0 \\[3pt] 0 & \tfrac{1}{2}\end{bmatrix}.
+\]
+The result is diagonal with entries $\Ni = N = 2$ (DM row) and $1/N = 1/2$
+(CM row).  This holds for all $N$:
+\[
+    \mathbf{M}
+    = \operatorname{diag}\!\bigl(\underbrace{\Ni,\,\ldots,\,\Ni}_{N-1},\;
+      \tfrac{1}{N}\bigr).
+\]
+
+\begin{circuitbox}[Physical Meaning of $\mathbf{M}$]
+\begin{itemize}
+    \item \textbf{DM row:} $R_{\mathrm{DM}} = \Ni R = NR$,\;
+          $L_{\mathrm{DM}} = NL$ — DM current circulates through two
+          lines in series, so impedance doubles (for $N = 2$). \checkmark
+    \item \textbf{CM row:} $R_{\mathrm{CM}} = R/N$,\;
+          $L_{\mathrm{CM}} = L/N$ — CM current splits equally across
+          all $N$ lines in parallel, so impedance divides. \checkmark
+    \item \textbf{No off-diagonal entries, for any $k$.}
+          The $R$--$L$ branch is identical on every line, so it can
+          never distinguish DM from CM — it can never cause coupling.
+\end{itemize}
+\end{circuitbox}
+
+\paragraph{$\mathbf{S}_{\mathrm{DCM}}$ depends on $k$ — this is where coupling lives.}
+
+Because $\mathbf{S}_N = \operatorname{diag}(1/C,\ldots,1/C,\,1/(kC))$
+is \emph{not} a scalar multiple of the identity when $k \neq 1$, the
+product $\TvN\,\mathbf{S}_N\,(\TiN)^{-1}$ will generally have
+off-diagonal entries.  Those off-diagonal entries are the
+\textbf{DM--CM coupling elastances} — directly readable once we are in
+the DCM basis.
+
